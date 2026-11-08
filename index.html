@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <meta name="theme-color" content="#07100f" />
+  <title>BLACKSITE // Hide & Seek</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="game-shell">
+    <canvas id="game" aria-label="Top down hide and seek game"></canvas>
+    <div class="grain"></div>
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark">B</span><div><b>BLACKSITE</b><small>CONTAINMENT WING 04</small></div></div>
+      <div class="mission"><span class="live-dot"></span><span id="statusText">SURVIVE THE HUNT</span></div>
+      <button class="icon-btn" id="soundBtn" aria-label="Toggle sound">♫ <span>SOUND</span></button>
+    </header>
+    <section class="hud-left">
+      <div class="hud-card objective-card"><span class="eyebrow">OBJECTIVE</span><strong id="objective">Stay hidden. Stay alive.</strong><div class="objective-progress"><i></i></div></div>
+      <div class="hud-card vitals"><div><span class="eyebrow">STAMINA</span><b id="staminaText">100%</b></div><div class="meter"><i id="staminaBar"></i></div><div class="vital-foot"><span>▰ <b id="survivors">10</b> SURVIVORS</span><span id="clock">03:00</span></div></div>
+    </section>
+    <aside class="hud-right">
+      <div class="location-card"><span class="eyebrow">CURRENT LOCATION</span><strong id="locationName">LABORATORY</strong><span class="location-sub" id="locationSub">Sector A · Capsule breach</span></div>
+      <div class="map-card"><div class="map-head"><span>FACILITY MAP</span><span class="map-live"><i></i> LIVE</span></div><canvas id="minimap" width="230" height="150"></canvas><div class="map-legend"><span><i class="dot you"></i> YOU</span><span><i class="dot bot"></i> CREW</span><span><i class="dot beast"></i> BEAST</span></div></div>
+    </aside>
+    <div class="toast" id="toast"></div>
+    <div class="interact-hint" id="interactHint"></div>
+    <section class="controls">
+      <div class="control-tip"><kbd>WASD</kbd><span>MOVE</span><i></i><kbd>SHIFT</kbd><span>RUN</span><i></i><kbd>CTRL</kbd><span>CROUCH</span></div>
+      <div class="action-buttons">
+        <button class="action-btn" id="crouchBtn"><span class="action-icon">⌄</span><span>CROUCH</span><kbd>CTRL</kbd></button>
+        <button class="action-btn" id="runBtn"><span class="action-icon">»</span><span>RUN</span><kbd>SHIFT</kbd></button>
+        <button class="action-btn" id="lightBtn"><span class="action-icon">◉</span><span>LIGHT</span><kbd>F</kbd></button>
+        <button class="action-btn warn" id="whistleBtn"><span class="action-icon">♬</span><span>WHISTLE</span><kbd>Q</kbd></button>
+      </div>
+    </section>
+    <div class="mobile-pad" aria-label="Movement controls"><button data-dir="up">▲</button><div><button data-dir="left">◀</button><button data-dir="down">▼</button><button data-dir="right">▶</button></div></div>
+    <button class="monitor-open" id="monitorOpen">▣ <span>SECURITY FEED</span></button>
+    <div class="modal-screen" id="introScreen">
+      <div class="intro-panel"><div class="warning-tag"><i></i> CONTAINMENT FAILURE · 02:17 AM</div><div class="capsule-icon"><span></span><i></i></div><h1>THE HUNT<br><em>IS ON.</em></h1><p>The glass is shattered. The Beast is loose.<br>Find a shadow. Don't let it find you.</p><div class="intro-meta"><span><b>10</b> CREW ON SITE</span><span><b>01</b> HOSTILE ENTITY</span><span><b>03:00</b> HOLD OUT</span></div><button class="primary-btn" id="startBtn">ENTER THE FACILITY <span>→</span></button><div class="tiny-note">WASD TO MOVE · FIND A PLACE TO HIDE · SURVIVE</div></div>
+    </div>
+    <div class="modal-screen hidden" id="endScreen"><div class="intro-panel end-panel"><div class="warning-tag" id="endTag">MISSION COMPLETE</div><h1 id="endTitle">YOU MADE<br><em>IT OUT.</em></h1><p id="endCopy">The facility is still standing. You aren't.</p><button class="primary-btn" id="againBtn">PLAY AGAIN <span>↻</span></button></div></div>
+    <div class="monitor-screen hidden" id="monitorScreen"><div class="monitor-window"><div class="monitor-title"><span><i class="live-dot"></i> CENTRAL SECURITY // LIVE FEED</span><button id="monitorClose">×</button></div><div class="monitor-layout"><div class="feed-frame"><canvas id="feedCanvas" width="640" height="360"></canvas><div class="feed-label" id="feedLabel">CAM 01 · LABORATORY</div><span class="rec">● REC</span></div><div class="cam-list" id="camList"></div></div><div class="monitor-footer"><span>CAMERAS OPERATING: <b>04 / 06</b></span><span>NO AUDIO · SIGNAL UNSTABLE</span></div></div></div>
+    <div class="elevator-screen hidden" id="elevatorScreen"><div class="elevator-box"><div class="warning-tag">CORE ACCESS // ELEVATOR</div><h2>SELECT A FLOOR</h2><p>Core shaft · Floors 01—05</p><div class="floor-buttons" id="floorButtons"></div><button class="cancel-btn" id="elevatorClose">CANCEL</button></div></div>
+    <div class="alert-flash" id="alertFlash"></div>
+  </main>
+  <script src="game.js"></script>
+</body>
+</html>
