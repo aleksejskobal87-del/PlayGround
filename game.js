@@ -19,6 +19,9 @@ let selectedSquare = -1;
 let legalTargets = [];
 let busy = false;
 let gameOver = false;
+let gameStarted = false;
+let playerPieceId = null;
+let selectedFigureId = null;
 let boardState;
 let history = [];
 let lastMove = null;
@@ -56,6 +59,9 @@ function world(index, y=0) { const [f,r] = coords(index); return new THREE.Vecto
 function algebraic(index) { const [f,r] = coords(index); return String.fromCharCode(97+f) + (r+1); }
 function pieceName(type) { return ({k:'KING',q:'QUEEN',r:'ROOK',b:'BISHOP',n:'KNIGHT',p:'PAWN'})[type]; }
 function colorName(color) { return color === 'w' ? 'ally' : 'enemy'; }
+const pieceGlyph={k:'♔',q:'♕',r:'♖',b:'♗',n:'♘',p:'♙'};
+const chatBubbles=new Map();
+let playerSquare=-1;
 
 function buildRoom() {
   const floor = new THREE.Mesh(new THREE.PlaneGeometry(200, 200), mat('#171b17', .92));
@@ -291,6 +297,44 @@ function updateRoster(){
   renderCaptured('#captured-allies','#lost-ally-count',whites,'w');renderCaptured('#captured-enemies','#lost-enemy-count',blacks,'b');
   document.querySelectorAll('.roster-unit').forEach(el=>el.classList.toggle('active',Number(el.dataset.index)===selectedSquare));
 }
+function buildFigureChoices(){
+  const grid=document.querySelector('#figure-grid');grid.innerHTML='';
+  for(let index=0;index<64;index++){
+    const piece=boardState.board[index];if(!piece||piece.color!=='w')continue;
+    const button=document.createElement('button');button.type='button';button.className='figure-option';button.dataset.pieceId=piece.id;
+    button.setAttribute('aria-pressed','false');
+    const glyph=document.createElement('span');glyph.className='figure-glyph';glyph.textContent=pieceGlyph[piece.type];
+    const meta=document.createElement('span');meta.className='figure-meta';meta.textContent=`${pieceName(piece.type)} · ${algebraic(index).toUpperCase()}`;
+    button.append(glyph,meta);
+    button.addEventListener('click',()=>{
+      selectedFigureId=piece.id;
+      grid.querySelectorAll('.figure-option').forEach(option=>{
+        const active=Number(option.dataset.pieceId)===piece.id;
+        option.classList.toggle('active',active);option.setAttribute('aria-pressed',String(active));
+      });
+      document.querySelector('#figure-preview').textContent=`${pieceName(piece.type)} · ${algebraic(index).toUpperCase()} selected`;
+      document.querySelector('#begin-game').disabled=false;
+    });
+    grid.appendChild(button);
+  }
+}
+function openStartScreen(){
+  gameStarted=false;selectedFigureId=null;playerPieceId=null;playerSquare=-1;
+  clearSelection();buildFigureChoices();
+  document.querySelector('#figure-preview').textContent='Select a figure to continue.';
+  document.querySelector('#begin-game').disabled=true;
+  const modal=document.querySelector('#start-modal');modal.classList.remove('closed');modal.setAttribute('aria-hidden','false');
+}
+function beginGame(){
+  if(selectedFigureId===null)return;
+  playerPieceId=selectedFigureId;playerSquare=boardState.board.findIndex(piece=>piece&&piece.id===playerPieceId);
+  if(playerSquare<0)return;
+  gameStarted=true;
+  const modal=document.querySelector('#start-modal');modal.classList.add('closed');modal.setAttribute('aria-hidden','true');
+  setView('commander');selectPiece(playerSquare);
+  document.querySelector('#move-message').textContent=`You are the ${pieceName(boardState.board[playerSquare].type)} at ${algebraic(playerSquare).toUpperCase()}. Choose a highlighted square or another ally.`;
+}
+
 function renderCaptured(containerId,countId,pieces,color){
   const container=document.querySelector(containerId);container.innerHTML=pieces.length?'':'<span class="empty-capture">—</span>';
   for(const p of pieces){const span=document.createElement('span');span.textContent=({k:'♚',q:'♛',r:'♜',b:'♝',n:'♞',p:'♟'})[p.type];container.appendChild(span);}
@@ -305,6 +349,39 @@ function updateIntel(message='Your allies are in position. Take the first move a
   document.querySelectorAll('.intel-meter span').forEach((el,i)=>{el.classList.toggle('active',i<Math.max(1,(level+1)*3));el.classList.toggle('hot',check&&i<6);});
 }
 function showToast(text,duration=1100){const el=document.querySelector('#board-toast');el.textContent=text;el.classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('visible'),duration);}
+function showChat(pieceId,text){
+  const mesh=pieceMeshes.get(pieceId);if(!mesh||!gameStarted)return;
+  const prior=chatBubbles.get(pieceId);if(prior)prior.element.remove();
+  const bubble=document.createElement('div');bubble.className=`chat-bubble ${mesh.userData.color==='b'?'enemy':''}`;
+  const name=document.createElement('span');name.className='bubble-name';
+  const piece=boardState.board.find(candidate=>candidate&&candidate.id===pieceId);
+  name.textContent=`${mesh.userData.color==='w'?'IVORY':'ASHEN'} ${pieceName(piece?.type||mesh.userData.type)}`;
+  const line=document.createElement('span');line.textContent=text;bubble.append(name,line);
+  document.querySelector('#chat-bubbles').appendChild(bubble);
+  chatBubbles.set(pieceId,{element:bubble,expires:performance.now()+2600});
+}
+function speakAfterMove(piece,captured,move,check){
+  const moved=boardState.board[move.to];if(!moved)return;
+  const lines=piece.color==='w'
+    ? captured?['That square is ours now.','One less shadow on the board.','Keep the line moving.']:check?['The enemy king is exposed!','Press the attack!']:['Holding this square.','The line advances.','I have the position.']
+    : captured?['Another ivory piece falls.','The Ashen Court collects its due.','Your ranks are thinning.']:check?['Your king cannot hide.','The net is closing.']:['The court moves as one.','This square belongs to us.','The siege continues.'];
+  const message=lines[Math.floor(Math.random()*lines.length)];
+  showChat(moved.id,message);
+  if(captured&&captured.type!=='k')showChat(captured.id,piece.color==='w'?'You will be remembered.':'The order will avenge me.');
+}
+function updateChatBubbles(now){
+  if(!chatBubbles.size)return;
+  const frameRect=document.querySelector('#board-frame').getBoundingClientRect(),canvasRect=canvas.getBoundingClientRect();
+  for(const [id,bubble] of chatBubbles){
+    const mesh=pieceMeshes.get(id);
+    if(now>=bubble.expires||!mesh){bubble.element.remove();chatBubbles.delete(id);continue;}
+    const point=mesh.position.clone();point.y+=1.05;point.project(camera);
+    if(point.z>1||point.z< -1||Math.abs(point.x)>1.15||Math.abs(point.y)>1.15){bubble.element.style.display='none';continue;}
+    bubble.element.style.display='';
+    bubble.element.style.left=`${canvasRect.left-frameRect.left+(point.x+1)*canvasRect.width/2}px`;
+    bubble.element.style.top=`${canvasRect.top-frameRect.top+(1-point.y)*canvasRect.height/2}px`;
+  }
+}
 function updateTurnUI(){
   document.querySelector('#turn-label').textContent=gameOver?'BATTLE OVER':boardState.turn==='w'?'YOUR TURN':'ENEMY TURN';
   document.querySelector('#move-number').textContent=String(boardState.fullmove).padStart(2,'0');
@@ -329,11 +406,14 @@ function makeMove(move,source='player'){
   const moving=boardState.board[move.from],captured=move.ep?boardState.board[move.to+(moving.color==='w'?-8:8)]:boardState.board[move.to];
   history.push({state:cloneState(boardState),move:{...move},captured:captured?{...captured}:null});
   const result=applyMove(boardState,move);boardState=result.state;lastMove=move;
+  if(moving.id===playerPieceId)playerSquare=move.to;
+  if(captured?.id===playerPieceId)playerSquare=-1;
   if(captured){animateCapture(captured,world(move.to,.2));document.querySelector('#move-message').textContent=`${pieceName(captured.type)} defeated at ${algebraic(move.to).toUpperCase()}.`;
     showToast(captured.type==='k'?'KING DEFEATED':'UNIT DEFEATED');}
   else document.querySelector('#move-message').textContent=`${source==='bot'?'Ashen Court':'Ivory Order'}: ${pieceName(moving.type)} ${algebraic(move.from).toUpperCase()} → ${algebraic(move.to).toUpperCase()}.`;
   syncPieces();clearSelection();updateTurnUI();
   const check=inCheck(boardState,boardState.turn);updateIntel(check?'A king is under attack. Choose a response.':captured?'A combatant has fallen. The board shifts in your favor.':undefined);
+  speakAfterMove(moving,captured,move,check);
   if(check)showToast('CHECK',1200);
   const replies=allMoves(boardState);
   if(!replies.length){gameOver=true;busy=false;updateTurnUI();showResult(boardState.turn==='w'?'loss':'win',inCheck(boardState,boardState.turn));return;}
@@ -351,19 +431,28 @@ function showResult(result,checkmated){
   if(checkmated)showToast(won?'ASHEN KING CHECKMATED':'IVORY KING CHECKMATED',2600);
 }
 function attemptSquare(index){
-  if(busy||gameOver)return;
+  if(!gameStarted||busy||gameOver)return;
   if(selectedSquare>=0){const move=legalTargets.find(m=>m.to===index);if(move){busy=true;makeMove(move);return;}}
   const p=boardState.board[index];if(p&&p.color==='w'){selectPiece(index);return;}
   if(selectedSquare>=0){clearSelection();document.querySelector('#move-message').textContent='Selection cleared. Choose an ally to see its moves.';}
 }
 
 function resize(){const rect=canvas.getBoundingClientRect();if(!rect.width||!rect.height)return;renderer.setSize(rect.width,rect.height,false);camera.aspect=rect.width/rect.height;camera.updateProjectionMatrix();}
-function setView(mode){viewMode=mode;document.querySelector('#view-label').textContent=mode==='commander'?'COMMANDER VIEW':'TACTICAL VIEW';}
+function setView(mode){
+  viewMode=mode;
+  document.querySelector('#view-label').textContent=mode==='commander'?'FIRST PERSON VIEW':'TACTICAL VIEW';
+  camera.fov=mode==='commander'?62:42;camera.updateProjectionMatrix();
+}
 function updateCamera(dt){
   let targetPos,targetLook;
-  if(viewMode==='commander'&&selectedSquare>=0){const pos=world(selectedSquare,0);targetPos=new THREE.Vector3(pos.x+.15,3.8,pos.z+4.3);targetLook=new THREE.Vector3(pos.x,0,pos.z-.4);}
-  else if(viewMode==='commander'){targetPos=new THREE.Vector3(8.9,10.8,11.8);targetLook=new THREE.Vector3(0,0,0);}
-  else{targetPos=new THREE.Vector3(0,15.2,.01);targetLook=new THREE.Vector3(0,0,0);}
+  const embodiedSquare=playerPieceId===null?-1:boardState.board.findIndex(piece=>piece&&piece.id===playerPieceId);
+  if(viewMode==='commander'&&embodiedSquare>=0){
+    const pos=world(embodiedSquare,0);
+    targetPos=new THREE.Vector3(pos.x,1.42,pos.z);
+    targetLook=new THREE.Vector3(pos.x,0.12,pos.z+3.2);
+  }else if(viewMode==='commander'){
+    targetPos=new THREE.Vector3(8.9,10.8,11.8);targetLook=new THREE.Vector3(0,0,0);
+  }else{targetPos=new THREE.Vector3(0,15.2,.01);targetLook=new THREE.Vector3(0,0,0);}
   const ease=1-Math.exp(-dt*2.7);camera.position.lerp(targetPos,ease);cameraTarget.lerp(targetLook,ease);camera.lookAt(cameraTarget);
 }
 function animate(){requestAnimationFrame(animate);const dt=Math.min(.05,clock.getDelta());
@@ -378,7 +467,7 @@ function animate(){requestAnimationFrame(animate);const dt=Math.min(.05,clock.ge
     if(t>=1){scene.remove(e.object);if(e.geometry)e.geometry.dispose();effects.splice(i,1);}
   }
   for(const m of markerMeshes)if(m.userData.capture)m.material.opacity=.55+Math.sin(clock.elapsedTime*5)*.25;
-  updateCamera(dt);renderer.render(scene,camera);
+  updateCamera(dt);updateChatBubbles(performance.now());renderer.render(scene,camera);
 }
 
 canvas.addEventListener('pointerdown',event=>{
@@ -387,17 +476,30 @@ canvas.addEventListener('pointerdown',event=>{
   let obj=hits[0].object;while(obj&&!obj.userData.index&&obj.userData.index!==0)obj=obj.parent;
   if(obj&&Number.isInteger(obj.userData.index))attemptSquare(obj.userData.index);
 });
-document.querySelector('#view-toggle').addEventListener('click',()=>setView(viewMode==='commander'?'tactical':'commander'));
+document.querySelector('#begin-game').addEventListener('click',beginGame);
+document.querySelector('#view-toggle').addEventListener('click',()=>{if(gameStarted)setView(viewMode==='commander'?'tactical':'commander');});
 document.querySelector('#undo-button').addEventListener('click',()=>{
-  if(busy||gameOver||!history.length)return;clearTimeout(aiTimer);
+  if(!gameStarted||busy||!history.length)return;clearTimeout(aiTimer);
   // Undo the user's last move and the opponent's response as a pair when possible.
   const count=history.length>=2&&boardState.turn==='w'?2:1;
   for(let i=0;i<count&&history.length;i++){const entry=history.pop();boardState=entry.state;}
-  busy=false;gameOver=false;lastMove=history.length?history[history.length-1].move:null;clearSelection();syncPieces();updateTurnUI();updateIntel('The last exchange has been rewound. Choose a new line of attack.');document.querySelector('#move-message').textContent='Last move undone. The board is yours.';
+  busy=false;gameOver=false;lastMove=history.length?history[history.length-1].move:null;
+  playerSquare=boardState.board.findIndex(piece=>piece&&piece.id===playerPieceId);
+  clearChatBubbles();clearSelection();syncPieces();updateTurnUI();updateIntel('The last exchange has been rewound. Choose a new line of attack.');document.querySelector('#move-message').textContent='Last move undone. The board is yours.';
 });
 document.querySelector('#restart-button').addEventListener('click',()=>resetGame());
 document.querySelector('#play-again').addEventListener('click',()=>resetGame());
-function resetGame(){clearTimeout(aiTimer);boardState=initialState();history=[];lastMove=null;busy=false;gameOver=false;clearSelection();clearPieces();syncPieces();updateTurnUI();updateIntel();document.querySelector('#commander-name').textContent='KNIGHT';document.querySelector('#commander-coord').textContent='E1 · READY';document.querySelector('#move-message').textContent='Choose a unit to see its available moves.';document.querySelector('#result-modal').classList.remove('open');document.querySelector('#result-modal').setAttribute('aria-hidden','true');setView('commander');}
+function clearChatBubbles(){
+  for(const bubble of chatBubbles.values())bubble.element.remove();
+  chatBubbles.clear();
+}
+function resetGame(){
+  clearTimeout(aiTimer);clearChatBubbles();boardState=initialState();history=[];lastMove=null;busy=false;gameOver=false;
+  clearSelection();clearPieces();syncPieces();updateTurnUI();updateIntel();
+  document.querySelector('#move-message').textContent='Choose a figure to begin a new match.';
+  document.querySelector('#result-modal').classList.remove('open');document.querySelector('#result-modal').setAttribute('aria-hidden','true');
+  setView('commander');openStartScreen();
+}
 const helpModal=document.querySelector('#help-modal');
 document.querySelector('#help-button').addEventListener('click',()=>{helpModal.classList.add('open');helpModal.setAttribute('aria-hidden','false');});
 function closeHelp(){helpModal.classList.remove('open');helpModal.setAttribute('aria-hidden','true');}

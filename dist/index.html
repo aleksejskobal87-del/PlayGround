@@ -43,6 +43,7 @@
           <div class="board-corner corner-tr">64° 08′ N</div>
           <canvas id="game-canvas" aria-label="3D chessboard, click a piece and then a highlighted square"></canvas>
           <div class="board-vignette"></div>
+          <div id="chat-bubbles" class="chat-bubbles" aria-live="polite"></div>
           <div id="board-toast" class="board-toast" aria-live="polite"></div>
           <div class="board-caption"><span class="caption-line"></span><span>THE IRONWOOD TABLE</span><span class="caption-line"></span></div>
           <button class="view-chip" id="view-toggle" title="Switch between commander and tactical view"><span>◉</span> <span id="view-label">COMMANDER VIEW</span></button>
@@ -66,6 +67,7 @@
   </main>
   <div class="modal-backdrop" id="help-modal" aria-hidden="true"><div class="modal"><button class="modal-close" id="close-help" aria-label="Close">×</button><div class="eyebrow">FIELD MANUAL / 01</div><h2>Every move<br>is a <em>decision.</em></h2><p>You command the Ivory Order. Click an ally to take the field as that figure, then choose a glowing square to move. The Ashen Court answers with its own strategic move.</p><div class="manual-grid"><div><b>01</b><strong>SELECT</strong><span>Click any ivory figure to reveal legal moves.</span></div><div><b>02</b><strong>ADVANCE</strong><span>Click a highlighted tile. Captures trigger a combat animation.</span></div><div><b>03</b><strong>WIN</strong><span>Protect your king. Checkmate the opposing king.</span></div></div><div class="manual-tip">♟ &nbsp; The view button shifts the camera down to your active figure.</div><button class="primary-button" id="got-it">UNDERSTOOD <span>→</span></button></div></div>
   <div class="result-backdrop" id="result-modal" aria-hidden="true"><div class="result-card"><div class="result-sigil" id="result-sigil">♔</div><div class="eyebrow" id="result-eyebrow">BATTLE COMPLETE</div><h2 id="result-title">Checkmate.</h2><p id="result-copy"></p><button class="primary-button" id="play-again">FIGHT AGAIN <span>↻</span></button></div></div>
+  <div class="start-backdrop" id="start-modal" aria-hidden="false"><section class="start-card" role="dialog" aria-modal="true" aria-labelledby="start-title"><div class="eyebrow">CHOOSE YOUR FIGURE / 01</div><h2 id="start-title">Take your place<br>on the <em>board.</em></h2><p class="start-copy">Choose the Ivory Order figure you’ll embody. Your view begins at their position in first person.</p><div class="figure-grid" id="figure-grid" aria-label="Choose a figure"></div><div class="start-footer"><span id="figure-preview">Select a figure to continue.</span><button class="primary-button" id="begin-game" disabled>ENTER THE ARENA <span>→</span></button></div><div class="start-hint">You can switch to tactical view at any time.</div></section></div>
   <script type="module" src="game.js"></script>
 </body>
 </html>

@@ -43,6 +43,7 @@
           <div class="board-corner corner-tr">64° 08′ N</div>
           <canvas id="game-canvas" aria-label="3D chessboard, click a piece and then a highlighted square"></canvas>
           <div class="board-vignette"></div>
+          <div id="chat-bubbles" class="chat-bubbles" aria-live="polite"></div>
           <div id="board-toast" class="board-toast" aria-live="polite"></div>
           <div class="board-caption"><span class="caption-line"></span><span>THE IRONWOOD TABLE</span><span class="caption-line"></span></div>
           <button class="view-chip" id="view-toggle" title="Switch between commander and tactical view"><span>◉</span> <span id="view-label">COMMANDER VIEW</span></button>
@@ -66,6 +67,41 @@
   </main>
   <div class="modal-backdrop" id="help-modal" aria-hidden="true"><div class="modal"><button class="modal-close" id="close-help" aria-label="Close">×</button><div class="eyebrow">FIELD MANUAL / 01</div><h2>Every move<br>is a <em>decision.</em></h2><p>You command the Ivory Order. Click an ally to take the field as that figure, then choose a glowing square to move. The Ashen Court answers with its own strategic move.</p><div class="manual-grid"><div><b>01</b><strong>SELECT</strong><span>Click any ivory figure to reveal legal moves.</span></div><div><b>02</b><strong>ADVANCE</strong><span>Click a highlighted tile. Captures trigger a combat animation.</span></div><div><b>03</b><strong>WIN</strong><span>Protect your king. Checkmate the opposing king.</span></div></div><div class="manual-tip">♟ &nbsp; The view button shifts the camera down to your active figure.</div><button class="primary-button" id="got-it">UNDERSTOOD <span>→</span></button></div></div>
   <div class="result-backdrop" id="result-modal" aria-hidden="true"><div class="result-card"><div class="result-sigil" id="result-sigil">♔</div><div class="eyebrow" id="result-eyebrow">BATTLE COMPLETE</div><h2 id="result-title">Checkmate.</h2><p id="result-copy"></p><button class="primary-button" id="play-again">FIGHT AGAIN <span>↻</span></button></div></div>
+  <div class="start-backdrop" id="start-modal" aria-hidden="false">
+    <section class="start-card menu-card" role="dialog" aria-modal="true" aria-labelledby="start-title">
+      <div class="menu-page" id="main-menu-page">
+        <div class="menu-brand"><span class="brand-mark">♞</span><span>CHECKMATE <i>/ ARENA</i></span></div>
+        <div class="eyebrow">A LIVING CHESSBOARD <span class="tiny-rule"></span> EST. 2026</div>
+        <h2 id="start-title">The board<br>is <em>waiting.</em></h2>
+        <p class="start-copy">Take your place in a world where every piece has a voice. Choose your way into the battle.</p>
+        <div class="menu-actions"><button class="primary-button menu-start" id="open-modes">START <span>→</span></button><button class="menu-secondary" id="menu-help">FIELD MANUAL <span>↗</span></button></div>
+        <div class="menu-bottom"><span>01 — CHOOSE A MODE</span><span>CHECKMATE ARENA</span></div>
+      </div>
+      <div class="menu-page mode-page" id="mode-menu-page" hidden>
+        <button class="back-button" id="back-to-menu">← MAIN MENU</button>
+        <div class="eyebrow">SELECT YOUR EXPERIENCE / 01</div>
+        <h2>Choose a <em>mode.</em></h2>
+        <p class="start-copy">Pick a way to enter the Ironwood Table.</p>
+        <div class="mode-grid" id="mode-grid">
+          <button class="mode-option active" data-mode="solo" aria-pressed="true"><span class="mode-icon">♟</span><span class="mode-name">SOLO</span><span class="mode-description">Face the Ashen Court</span><span class="mode-status">AVAILABLE</span></button>
+          <button class="mode-option" data-mode="multiplayer" aria-pressed="false"><span class="mode-icon">♙♟</span><span class="mode-name">MULTIPLAYER</span><span class="mode-description">Challenge another player</span><span class="mode-status soon">COMING SOON</span></button>
+          <button class="mode-option" data-mode="training" aria-pressed="false"><span class="mode-icon">⌖</span><span class="mode-name">TRAINING</span><span class="mode-description">Practice the fundamentals</span><span class="mode-status soon">COMING SOON</span></button>
+          <button class="mode-option" data-mode="tutorial" aria-pressed="false"><span class="mode-icon">✧</span><span class="mode-name">TUTORIAL</span><span class="mode-description">Learn the rules of the field</span><span class="mode-status soon">COMING SOON</span></button>
+          <button class="mode-option" data-mode="classic" aria-pressed="false"><span class="mode-icon">▦</span><span class="mode-name">CLASSIC 2D</span><span class="mode-description">A traditional board view</span><span class="mode-status soon">COMING SOON</span></button>
+          <button class="mode-option" data-mode="omni-rook" aria-pressed="false"><span class="mode-icon">♜</span><span class="mode-name">VS OMNI ROOK</span><span class="mode-description">A different kind of opponent</span><span class="mode-status soon">COMING SOON</span></button>
+        </div>
+        <div class="mode-footer"><span id="mode-feedback">Solo mode is ready to play.</span><button class="primary-button" id="mode-continue">CONTINUE <span>→</span></button></div>
+      </div>
+      <div class="menu-page figure-page" id="figure-menu-page" hidden>
+        <button class="back-button" id="back-to-modes">← GAME MODES</button>
+        <div class="eyebrow">SOLO / CHOOSE YOUR FIGURE</div><h2>Take your place<br>on the <em>board.</em></h2>
+        <p class="start-copy">Choose the Ivory Order figure you’ll embody. Your view begins at their position in first person.</p>
+        <div class="figure-grid" id="figure-grid" aria-label="Choose a figure"></div>
+        <div class="start-footer"><span id="figure-preview">Select a figure to continue.</span><button class="primary-button" id="begin-game" disabled>ENTER THE ARENA <span>→</span></button></div>
+        <div class="start-hint">You can switch to tactical view at any time.</div>
+      </div>
+    </section>
+  </div>
   <script type="module" src="game.js"></script>
 </body>
 </html>
