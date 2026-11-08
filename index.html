@@ -22,6 +22,7 @@
     <section class="hud-left">
       <div class="hud-card objective-card"><span class="eyebrow">OBJECTIVE</span><strong id="objective">Stay hidden. Stay alive.</strong><div class="objective-progress"><i></i></div></div>
       <div class="hud-card vitals"><div><span class="eyebrow">STAMINA</span><b id="staminaText">100%</b></div><div class="meter"><i id="staminaBar"></i></div><div class="vital-foot"><span>▰ <b id="survivors">10</b> SURVIVORS</span><span id="clock">03:00</span></div></div>
+      <div class="hud-card task-card"><span class="eyebrow">FACILITY TASKS</span><strong id="taskStatus">0/3 TASKS COMPLETE · EXIT LOCKED</strong><ul><li id="task-containment">Stabilize containment</li><li id="task-security">Restore security uplink</li><li id="task-coolant">Reroute freezer coolant</li></ul></div>
     </section>
     <aside class="hud-right">
       <div class="location-card"><span class="eyebrow">CURRENT LOCATION</span><strong id="locationName">LABORATORY</strong><span class="location-sub" id="locationSub">Sector A · Capsule breach</span></div>
@@ -38,7 +39,7 @@
         <button class="action-btn warn" id="whistleBtn"><span class="action-icon">♬</span><span>WHISTLE</span><kbd>Q</kbd></button>
       </div>
     </section>
-    <div class="mobile-pad" aria-label="Movement controls"><button data-dir="up">▲</button><div><button data-dir="left">◀</button><button data-dir="down">▼</button><button data-dir="right">▶</button></div></div>
+    <div class="mobile-joystick" id="joystick" aria-label="Movement joystick"><div class="joystick-ring"><div class="joystick-knob" id="joystickKnob"></div></div></div>
     <button class="monitor-open" id="monitorOpen">▣ <span>SECURITY FEED</span></button>
     <div class="modal-screen" id="introScreen">
       <div class="intro-panel"><div class="warning-tag"><i></i> CONTAINMENT FAILURE · 02:17 AM</div><div class="capsule-icon"><span></span><i></i></div><h1>THE HUNT<br><em>IS ON.</em></h1><p>The glass is shattered. The Beast is loose.<br>Find a shadow. Don't let it find you.</p><div class="intro-meta"><span><b>10</b> CREW ON SITE</span><span><b>01</b> HOSTILE ENTITY</span><span><b>03:00</b> HOLD OUT</span></div><button class="primary-btn" id="startBtn">ENTER THE FACILITY <span>→</span></button><div class="tiny-note">WASD TO MOVE · FIND A PLACE TO HIDE · SURVIVE</div></div>
