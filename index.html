@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#101513" />
+  <title>Checkmate Arena — A living chessboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="Checkmate Arena home"><span class="brand-mark">♞</span><span>CHECKMATE<span class="brand-light"> / ARENA</span></span></a>
+      <div class="top-center"><span class="live-dot"></span> FIELD OPERATIONS <span class="slash">/</span> <span id="game-id">MATCH 001</span></div>
+      <button class="icon-btn help-btn" id="help-button" aria-label="How to play">?<span class="help-word">HOW TO PLAY</span></button>
+    </header>
+    <section class="game-layout">
+      <aside class="side-panel left-panel">
+        <div class="eyebrow">YOUR SQUAD <span class="tiny-rule"></span></div>
+        <div class="team-card ally-card">
+          <div class="team-symbol ally-symbol">♔</div>
+          <div><div class="team-name">THE IVORY ORDER</div><div class="team-sub">PLAYER + ALLIES</div></div>
+          <div class="team-status"><i></i> ACTIVE</div>
+        </div>
+        <div class="commander-block">
+          <div class="section-label">COMMANDER</div>
+          <div class="commander-card"><div class="commander-avatar">♘</div><div><strong id="commander-name">KNIGHT</strong><span id="commander-coord">E1 · READY</span></div><span class="you-tag">YOU</span></div>
+        </div>
+        <div class="squad-heading"><span>FIELD ROSTER</span><span id="ally-count">16 UNITS</span></div>
+        <div class="roster" id="ally-roster"></div>
+        <div class="field-note"><span class="note-icon">✦</span><span>Your squad moves together. Select any ally to issue a move; the others hold the line.</span></div>
+      </aside>
+      <section class="arena-column">
+        <div class="arena-topline">
+          <div><div class="eyebrow">LIVE ENCOUNTER</div><h1>The Last <em>Square</em></h1></div>
+          <div class="round-pill"><span class="pulse"></span><span id="turn-label">YOUR TURN</span><span class="round-divider"></span><span id="move-number">01</span></div>
+        </div>
+        <div class="board-frame" id="board-frame">
+          <div class="board-corner corner-tl">A R C H I V E &nbsp;  / &nbsp;  0 1</div>
+          <div class="board-corner corner-tr">64° 08′ N</div>
+          <canvas id="game-canvas" aria-label="3D chessboard, click a piece and then a highlighted square"></canvas>
+          <div class="board-vignette"></div>
+          <div id="board-toast" class="board-toast" aria-live="polite"></div>
+          <div class="board-caption"><span class="caption-line"></span><span>THE IRONWOOD TABLE</span><span class="caption-line"></span></div>
+          <button class="view-chip" id="view-toggle" title="Switch between commander and tactical view"><span>◉</span> <span id="view-label">COMMANDER VIEW</span></button>
+          <div class="board-coordinates">A—H &nbsp; / &nbsp; 1—8</div>
+        </div>
+        <div class="arena-footer">
+          <div class="move-log"><span class="log-icon">⌁</span><span id="move-message">Choose a unit to see its available moves.</span></div>
+          <div class="board-controls"><button id="undo-button" class="text-btn">↶ <span>UNDO</span></button><button id="restart-button" class="text-btn">↻ <span>NEW MATCH</span></button></div>
+        </div>
+      </section>
+      <aside class="side-panel right-panel">
+        <div class="eyebrow">OPPOSING FORCE <span class="tiny-rule"></span></div>
+        <div class="team-card enemy-card"><div class="team-symbol enemy-symbol">♚</div><div><div class="team-name">THE ASHEN COURT</div><div class="team-sub">AUTONOMOUS OPPONENT</div></div><div class="team-status enemy-status"><i></i> HOSTILE</div></div>
+        <div class="intel-card"><div class="intel-top"><span class="section-label">BATTLE INTEL</span><span class="intel-mark">◈</span></div><div class="intel-headline" id="intel-headline">A quiet opening.</div><div class="intel-copy" id="intel-copy">Your allies are in position. Take the first move and shape the battle.</div><div class="intel-meter"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div><div class="meter-label"><span>THREAT LEVEL</span><span id="threat-label">LOW</span></div></div>
+        <div class="captured-group"><div class="squad-heading"><span>LOST ALLIES</span><span id="lost-ally-count">00</span></div><div class="captured-pieces" id="captured-allies"><span class="empty-capture">—</span></div></div>
+        <div class="captured-group enemy-captures"><div class="squad-heading"><span>ENEMY CASUALTIES</span><span id="lost-enemy-count">00</span></div><div class="captured-pieces" id="captured-enemies"><span class="empty-capture">—</span></div></div>
+        <div class="objective-card"><div class="objective-icon">✧</div><div><span class="section-label">PRIMARY OBJECTIVE</span><strong>Protect the King</strong><p>Defeat the opposing king to end the siege.</p></div></div>
+      </aside>
+    </section>
+    <footer class="statusbar"><span><i class="status-live"></i> SIMULATION ONLINE</span><span>TURN-BASED COMBAT <b>·</b> NO TIME LIMIT</span><span>CHECKMATE ARENA <b>©</b> 2026</span></footer>
+  </main>
+  <div class="modal-backdrop" id="help-modal" aria-hidden="true"><div class="modal"><button class="modal-close" id="close-help" aria-label="Close">×</button><div class="eyebrow">FIELD MANUAL / 01</div><h2>Every move<br>is a <em>decision.</em></h2><p>You command the Ivory Order. Click an ally to take the field as that figure, then choose a glowing square to move. The Ashen Court answers with its own strategic move.</p><div class="manual-grid"><div><b>01</b><strong>SELECT</strong><span>Click any ivory figure to reveal legal moves.</span></div><div><b>02</b><strong>ADVANCE</strong><span>Click a highlighted tile. Captures trigger a combat animation.</span></div><div><b>03</b><strong>WIN</strong><span>Protect your king. Checkmate the opposing king.</span></div></div><div class="manual-tip">♟ &nbsp; The view button shifts the camera down to your active figure.</div><button class="primary-button" id="got-it">UNDERSTOOD <span>→</span></button></div></div>
+  <div class="result-backdrop" id="result-modal" aria-hidden="true"><div class="result-card"><div class="result-sigil" id="result-sigil">♔</div><div class="eyebrow" id="result-eyebrow">BATTLE COMPLETE</div><h2 id="result-title">Checkmate.</h2><p id="result-copy"></p><button class="primary-button" id="play-again">FIGHT AGAIN <span>↻</span></button></div></div>
+  <script type="module" src="game.js"></script>
+</body>
+</html>
