@@ -2,3 +2,10 @@
 .mobile-joystick{display:none}.task-card{margin-top:8px}.task-card strong{display:block;margin-top:5px;font-size:9px;line-height:1.4;color:#d4ded7}.task-card ul{list-style:none;padding:0;margin:7px 0 0;display:grid;gap:5px}.task-card li{font-size:8px;color:#899890;line-height:1.25}.task-card li:before{content:'○';color:#d39a62;margin-right:6px}.task-card li.done{color:#c7f36a;text-decoration:line-through}.task-card li.done:before{content:'✓';color:#c7f36a}.interact-hint{max-width:min(90vw,520px)}
 @media(max-width:900px){.mobile-joystick{display:block;position:absolute;z-index:6;left:18px;bottom:92px;width:124px;height:124px;touch-action:none;user-select:none}.joystick-ring{position:absolute;inset:0;border:1px solid rgba(202,225,211,.38);border-radius:50%;background:rgba(9,18,17,.48);box-shadow:inset 0 0 22px rgba(0,0,0,.4)}.joystick-knob{position:absolute;left:50%;top:50%;width:48px;height:48px;margin:-24px;border:1px solid rgba(199,243,106,.7);border-radius:50%;background:rgba(199,243,106,.27);box-shadow:0 0 18px rgba(199,243,106,.16);pointer-events:none;will-change:transform}.task-card{max-width:210px}.task-card li{font-size:7px}}
 @media(max-width:540px){.mobile-joystick{left:10px;bottom:86px;width:106px;height:106px}.joystick-knob{width:42px;height:42px;margin:-21px}.task-card{max-width:170px}.task-card strong{font-size:8px}.task-card li{font-size:6px}.hud-left{gap:5px}.hud-left .task-card{padding:8px}}
+/* Keep the playfield readable beneath the compact HUD. */
+.hud-card,.location-card,.map-card{background:rgba(9,18,17,.58);backdrop-filter:blur(3px)}
+.topbar{background:linear-gradient(180deg,rgba(5,11,10,.62),rgba(5,11,10,.08));border-bottom-color:rgba(202,225,211,.08)}
+.controls{height:76px;background:linear-gradient(0deg,rgba(4,9,8,.76),rgba(4,9,8,.24));border-top-color:rgba(202,225,211,.07)}
+.hud-left,.hud-right{gap:7px}
+.objective-card,.vitals,.task-card,.location-card,.map-card{box-shadow:0 6px 24px rgba(0,0,0,.12)}
+@media(max-width:850px){.controls{height:68px}.hud-card,.location-card{background:rgba(9,18,17,.46)}}
