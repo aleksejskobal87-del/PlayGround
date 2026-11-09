@@ -26,12 +26,36 @@ const CARD_POOL = [
   {id:'prismphoenix',name:'Prism Phoenix',emoji:'🦚',tier:'Special',power:151,pack:'solar'},
   {id:'eclipse',name:'The Eclipse',emoji:'🌑',tier:'Secret',power:199,pack:'moon'},
   {id:'firstlight',name:'First Light',emoji:'🌟',tier:'Secret',power:210,pack:'solar'},
-  {id:'worldseed',name:'Worldseed',emoji:'🌱',tier:'Secret',power:205,pack:'meadow'}
+  {id:'worldseed',name:'Worldseed',emoji:'🌱',tier:'Secret',power:205,pack:'meadow'},
+  {id:'frostpup',name:'Frostpup',emoji:'🐺',tier:'Normal',power:27,pack:'frost'},
+  {id:'snowbell',name:'Snowbell',emoji:'🔔',tier:'Gold',power:44,pack:'frost'},
+  {id:'glacierowl',name:'Glacierowl',emoji:'🦉',tier:'Rare',power:65,pack:'frost'},
+  {id:'aurorawolf',name:'Aurora Wolf',emoji:'🐺',tier:'Diamond',power:89,pack:'frost'},
+  {id:'icecrown',name:'Icecrown',emoji:'👑',tier:'Godlike',power:114,pack:'frost'},
+  {id:'polarstar',name:'Polar Star',emoji:'🌠',tier:'Special',power:155,pack:'frost'},
+  {id:'winterheart',name:'Winterheart',emoji:'💎',tier:'Secret',power:218,pack:'frost'},
+  {id:'stormkit',name:'Stormkit',emoji:'🐈‍⬛',tier:'Normal',power:26,pack:'storm'},
+  {id:'zapwing',name:'Zapwing',emoji:'🦇',tier:'Gold',power:47,pack:'storm'},
+  {id:'cloudram',name:'Cloudram',emoji:'🐏',tier:'Rare',power:69,pack:'storm'},
+  {id:'thunderbird',name:'Thunderbird',emoji:'🦅',tier:'Diamond',power:91,pack:'storm'},
+  {id:'tempest',name:'Tempest',emoji:'🌪️',tier:'Godlike',power:118,pack:'storm'},
+  {id:'skyempress',name:'Sky Empress',emoji:'🦚',tier:'Special',power:159,pack:'storm'},
+  {id:'stormking',name:'Storm King',emoji:'⚡',tier:'Secret',power:224,pack:'storm'},
+  {id:'bloomling',name:'Bloomling',emoji:'🌷',tier:'Normal',power:22,pack:'garden'},
+  {id:'honeybun',name:'Honeybun',emoji:'🐝',tier:'Gold',power:42,pack:'garden'},
+  {id:'petalfox',name:'Petalfox',emoji:'🦊',tier:'Rare',power:63,pack:'garden'},
+  {id:'rosedragon',name:'Rosedragon',emoji:'🐉',tier:'Diamond',power:85,pack:'garden'},
+  {id:'heartwood',name:'Heartwood',emoji:'🌳',tier:'Godlike',power:112,pack:'garden'},
+  {id:'everbloom',name:'Everbloom',emoji:'🌺',tier:'Special',power:153,pack:'garden'},
+  {id:'worldflower',name:'Worldflower',emoji:'🌼',tier:'Secret',power:220,pack:'garden'}
 ];
 const PACKS = [
   {id:'meadow',name:'Meadow Friends',subtitle:'Gentle souls & leafy legends',emoji:'🌿',cost:120,caption:'MEADOW SET',className:'meadow'},
   {id:'moon',name:'Moonlit Wonders',subtitle:'Dreamers from another world',emoji:'🌙',cost:160,caption:'MOON SET',className:'moon'},
-  {id:'solar',name:'Sunflare Legends',subtitle:'Bright hearts, big power',emoji:'☀️',cost:210,caption:'SOLAR SET',className:'solar'}
+  {id:'solar',name:'Sunflare Legends',subtitle:'Bright hearts, big power',emoji:'☀️',cost:210,caption:'SOLAR SET',className:'solar'},
+  {id:'frost',name:'Frostbound Friends',subtitle:'Snowy spirits & icy legends',emoji:'❄️',cost:180,caption:'FROST SET',className:'frost'},
+  {id:'storm',name:'Storm Chasers',subtitle:'Wild winds & electric wonders',emoji:'⛈️',cost:230,caption:'STORM SET',className:'storm'},
+  {id:'garden',name:'Wondergarden',subtitle:'Petal pals & blooming magic',emoji:'🌷',cost:145,caption:'GARDEN SET',className:'garden'}
 ];
 const UNLOCKS = [
   {level:2,name:'Collection journal',view:'journal'},
@@ -40,7 +64,7 @@ const UNLOCKS = [
   {level:12,name:'Card hunting mode',view:'hunting'},
   {level:15,name:'Rebirth',view:'rebirth'}
 ];
-const INITIAL = {coins:600,level:1,xp:0,collection:{},stored:[],rebirths:0,huntTarget:null,welcomeClaimed:false,packCount:0};
+const INITIAL = {coins:600,level:1,xp:0,collection:{},stored:[],rebirths:0,huntTarget:null,welcomeClaimed:false,packCount:0,deliveries:[],activeReview:null};
 let state = loadState();
 let activeFilter = 'all';
 let toastTimer;
@@ -83,17 +107,18 @@ function persistRender(){save();render();}
 function setView(view){
   const unlocked=UNLOCKS.find(u=>u.view===view);
   if(unlocked&&state.level<unlocked.level){toast(`Unlocks at level ${unlocked.level}. Keep collecting!`);return;}
-  document.querySelectorAll('.view').forEach(el=>el.classList.toggle('active',el.id===`view-${view}`));
-  document.querySelectorAll('.nav-link[data-view]').forEach(el=>el.classList.toggle('active',el.dataset.view===view));
   const names={packs:'Pack shop',collection:'Collection',journal:'Collection journal',storage:'Pack storage',hunting:'Card hunting',rebirth:'Rebirth'};
   document.getElementById('crumbTitle').textContent=names[view]||'Pack shop';
+  document.querySelectorAll('.view').forEach(el=>el.classList.toggle('active',el.id===`view-${view}`));
+  document.querySelectorAll('.nav-link[data-view]').forEach(el=>el.classList.toggle('active',el.dataset.view===view));
   document.getElementById('sidebar').classList.remove('open');
   if(view==='hunting')renderHunting();
-  window.scrollTo({top:0,behavior:'smooth'});
+  document.querySelector('.app-shell').scrollIntoView({behavior:'smooth',block:'start'});
 }
 function render(){
   document.getElementById('coinBalance').textContent=state.coins.toLocaleString();
   document.getElementById('levelNumber').textContent=state.level;
+  renderRoom();
   document.getElementById('collectionNavCount').textContent=ownedCount();
   const xpPct=Math.min(100,state.xp/xpFor(state.level)*100);
   document.getElementById('sideProgress').style.width=xpPct+'%';
@@ -111,7 +136,7 @@ function render(){
   document.getElementById('collectionTotal').textContent=ownedCount();
   document.getElementById('allCount').textContent=ownedCount();
   document.getElementById('journalCount').textContent=ownedCount();
-  document.getElementById('storageCount').textContent=state.stored.length;
+  document.getElementById('storageCount').textContent=(state.deliveries||[]).reduce((total,delivery)=>total+delivery.packs.length,0);
   document.getElementById('rebirthCount').textContent=state.rebirths;
   document.getElementById('rebirthRequirement').textContent=`Level ${Math.min(state.level,15)} / 15`;
   document.getElementById('rebirthProgress').style.width=Math.min(100,state.level/15*100)+'%';
@@ -124,9 +149,7 @@ function renderPacks(){
     <div class="pack-visual ${p.className}"><span class="pack-no">VOL. 0${i+1}</span><span class="pack-emoji">${p.emoji}</span><span class="pack-caption">${p.caption}</span></div>
     <div class="pack-info"><h3>${p.name}</h3><p>${p.subtitle}</p></div>
     <div class="pack-actions"><span class="pack-cost"><span class="coin-icon">◉</span>${p.cost}</span>
-      ${state.level>=9?`<select class="quantity-select" id="qty-${p.id}" aria-label="Packs to buy">${[1,5,10].map(n=>`<option value="${n}">${n}×</option>`).join('')}</select>`:''}
-      <button class="pack-buy" data-buy="${p.id}">${state.level>=9?'Buy':'Buy pack'}</button>
-      ${state.level>=5?`<button class="pack-store" data-store="${p.id}" title="Buy and store a sealed pack">＋ Store</button>`:''}
+      <button class="pack-buy" data-buy="${p.id}">Order on phone</button>
     </div></article>`).join('');
 }
 function renderCollection(){
@@ -143,8 +166,8 @@ function renderJournal(){
 }
 function renderStorage(){
   const list=document.getElementById('storedList');
-  if(!state.stored.length){list.innerHTML=`<div class="empty-state"><div><span>▤</span><strong>No sealed packs just yet.</strong><p>Use the “＋ Store” button in the shop to save packs for later.</p><button class="button button-dark" data-goto="packs">Find a pack <span>↗</span></button></div></div>`;return;}
-  list.innerHTML=state.stored.map((id,index)=>{const p=PACKS.find(x=>x.id===id)||PACKS[0];return `<article class="stored-pack"><div class="mini-pack ${p.className}">${p.emoji}</div><div><strong>${p.name}</strong><small>Sealed pack · 3 cards inside</small></div><button data-open-stored="${index}">Open pack ↗</button></article>`}).join('');
+  if(!state.deliveries?.length){list.innerHTML=`<div class="empty-state"><div><span>▤</span><strong>No deliveries are waiting.</strong><p>Pick up your phone and order a card pack to see it arrive on your desk.</p><button class="button button-dark" id="storagePhoneButton">Open Ordermart <span>↗</span></button></div></div>`;return;}
+  list.innerHTML=state.deliveries.map((delivery,index)=>{const p=PACKS.find(x=>x.id===delivery.packs[0])||PACKS[0];return `<article class="stored-pack"><div class="mini-pack ${p.className}">${p.emoji}</div><div><strong>${p.name}${delivery.packs.length>1?` × ${delivery.packs.length}`:''}</strong><small>Delivery on your desk · ${delivery.packs.length*3} cards inside</small></div><button data-room-delivery="${index}">Unbox on desk ↗</button></article>`}).join('');
 }
 function renderHunting(){
   const el=document.getElementById('huntOptions');if(!el)return;
@@ -156,68 +179,90 @@ function renderHunting(){
 function notifyLevelUps(levels){if(levels.length){const latest=levels[levels.length-1];toast(`Level up! You're now level ${latest}.`);setTimeout(()=>{const just=UNLOCKS.find(u=>u.level===latest);if(just)toast(`Unlocked: ${just.name}!`);},1600);}}
 function buyPack(packId,{store=false,amount=1}={}){
   const pack=PACKS.find(p=>p.id===packId);if(!pack)return;
-  if(amount>1&&state.level<9){toast('Buying multiple packs unlocks at level 9.');return;}
-  if(store&&state.level<5){toast('Pack storage unlocks at level 5.');return;}
   amount=Math.max(1,Math.min(10,Number(amount)||1));
-  if(store)amount=1;
   const cost=pack.cost*amount;
-  if(state.coins<cost){toast(`You need ${cost.toLocaleString()} coins for that.`);return;}
+  if(state.coins<cost){roomToast(`You need ${cost.toLocaleString()} coins for that.`);return;}
   state.coins-=cost;
-  if(store){state.stored.push(packId);persistRender();toast(`${pack.name} added to storage.`);return;}
-  openPacks(packId,amount);
+  const delivery={id:Date.now()+Math.random(),packs:Array(amount).fill(packId)};
+  state.deliveries=state.deliveries||[];state.deliveries.push(delivery);save();render();closePhone();
+  roomToast(`${pack.name}${amount>1?` ×${amount}`:''} ordered! Your delivery is on the desk.`);
 }
-function openPacks(packId,amount=1){
-  const results=[];for(let i=0;i<amount*3;i++)results.push(drawCard(packId));
-  state.packCount+=amount;
-  const levels=addXp(amount*45);
-  const newly=[];let duplicateCount=0;
-  const cards=results.map(card=>{
-    if(state.collection[card.id]){duplicateCount++;return {card,duplicate:true};}
-    state.collection[card.id]=1;newly.push(card);return {card,duplicate:false};
-  });
-  save();render();notifyLevelUps(levels);
-  document.getElementById('packModalTitle').textContent=amount===1?'Look what you found!':`${amount} packs opened!`;
-  document.getElementById('packModalSubtitle').textContent=`${newly.length} new ${newly.length===1?'discovery':'discoveries'} · ${duplicateCount} duplicate${duplicateCount===1?'':'s'} to decide on`;
-  document.getElementById('resultXp').textContent=`✦ +${amount*45} XP earned`;
-  const container=document.getElementById('resultCards');
-  container.innerHTML=cards.map((entry,i)=>{
-    const c=entry.card;
-    return `<article class="result-card" data-result="${i}"><div class="creature-art ${tierClass(c.tier)} cr-art-bg"><small>${c.tier.toUpperCase()}</small><span class="creature-emoji">${c.emoji}</span></div><div class="result-details"><h3>${c.name}</h3><span class="tier ${tierClass(c.tier)}">${c.tier}</span><p class="${entry.duplicate?'duplicate-note':'new-card-note'}">${entry.duplicate?'Duplicate · choose what to do':'✦ New to your collection!'}</p>${entry.duplicate?`<div class="duplicate-actions"><button class="action-sell" data-duplicate="sell" data-card="${c.id}">Sell +${sellValue(c)} ◉</button><button class="action-trash" data-duplicate="trash" data-card="${c.id}">Trash</button><button class="action-keep" data-duplicate="keep" data-card="${c.id}">Keep</button></div>`:''}</div></article>`;
-  }).join('');
-  document.getElementById('packModal').classList.add('show');document.getElementById('packModal').setAttribute('aria-hidden','false');
-  if(state.huntTarget){state.huntTarget=null;save();renderHunting();}
+function renderRoom(){
+  const coins=document.getElementById('roomCoins'),level=document.getElementById('roomLevel');
+  if(coins)coins.textContent=state.coins.toLocaleString();if(level)level.textContent=state.level;
+  const deliveryButton=document.getElementById('deliveryButton');
+  if(deliveryButton){const available=(state.deliveries||[]).length;deliveryButton.hidden=!available&&!state.activeReview;deliveryButton.classList.toggle('has-many',available>1);const hint=deliveryButton.querySelector('.object-hint');if(hint)hint.textContent=state.activeReview?'RESUME CARD REVIEW':`YOUR DELIVERY${available>1?` · ${available} WAITING`:''} · CLICK TO UNBOX`;}
+  const phone=document.getElementById('phoneButton');if(phone)phone.classList.toggle('phone-picked',document.getElementById('phoneOverlay')?.classList.contains('show'));
 }
+function renderOrdermart(){
+  const content=document.getElementById('phoneContent');if(!content)return;
+  content.innerHTML=`<div class="order-welcome"><span>GOOD THINGS, DELIVERED ✦</span><h2>Make room<br>for a new friend.</h2><p>Choose a set and we'll bring it straight to your desk.</p><div class="order-wallet">◉ ${state.coins.toLocaleString()} <small>AVAILABLE COINS</small></div></div><div class="order-section-title"><b>Today's card packs</b><span>3 CARDS EACH</span></div><div class="order-pack-list">${PACKS.map(p=>`<article class="order-pack"><div class="order-pack-icon ${p.className}">${p.emoji}</div><div class="order-pack-copy"><b>${p.name}</b><small>${p.subtitle}</small><strong>◉ ${p.cost}${state.level>=9?' each':''}</strong></div>${state.level>=9?`<select class="order-quantity" aria-label="${p.name} quantity">${[1,5,10].map(n=>`<option value="${n}">${n}×</option>`).join('')}</select>`:''}<button data-phone-order="${p.id}">Order <span>↗</span></button></article>`).join('')}</div><div class="order-footnote">📦 &nbsp; Your Pocket Post delivery appears on the desk.</div>`;
+}
+function openPhone(){renderOrdermart();const overlay=document.getElementById('phoneOverlay');overlay.classList.add('show');overlay.setAttribute('aria-hidden','false');renderRoom();}
+function closePhone(){const overlay=document.getElementById('phoneOverlay');if(!overlay)return;overlay.classList.remove('show');overlay.setAttribute('aria-hidden','true');renderRoom();}
+function roomToast(message){const el=document.getElementById('roomToast');if(!el)return;el.textContent=message;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),2800);}
+
 function sellValue(cardId){const c=CARD_POOL.find(x=>x.id===cardId);return Math.round(({Normal:12,Gold:24,Rare:42,Diamond:75,Godlike:130,Special:220,Secret:400}[c?.tier]||12)*(1+state.rebirths*.1));}
-function resolveDuplicate(button){
-  const id=button.dataset.card,action=button.dataset.duplicate;const card=CARD_POOL.find(c=>c.id===id);
-  if(action==='sell'){state.coins+=sellValue(id);button.closest('.result-card').classList.add('resolved');button.closest('.result-card').querySelector('.duplicate-note').textContent=`Sold for ${sellValue(id)} coins`;}
-  if(action==='trash'){button.closest('.result-card').classList.add('resolved');button.closest('.result-card').querySelector('.duplicate-note').textContent='Sent to the trash';}
-  if(action==='keep'){state.collection[id]=(state.collection[id]||1)+1;button.closest('.result-card').classList.add('resolved');button.closest('.result-card').querySelector('.duplicate-note').textContent='Added to your collection';}
-  button.closest('.duplicate-actions').remove();persistRender();
+function showReviewCard(){
+  const review=state.activeReview;if(!review)return;
+  const c=review.cards[review.index],stage=document.getElementById('unboxCardStage');
+  document.getElementById('unboxTitle').textContent=`Card ${review.index+1} of ${review.cards.length}`;
+  document.getElementById('unboxSubtitle').textContent=state.collection[c.id]?`You already have ${state.collection[c.id]} ${c.name}${state.collection[c.id]===1?'':'s'}. What should happen to this one?`:`A new discovery! Choose its home.`;
+  document.getElementById('unboxProgress').style.width=`${((review.index+1)/review.cards.length)*100}%`;
+  stage.innerHTML=`<article class="revealed-card ${tierClass(c.tier)}"><div class="revealed-card-top"><span>${c.tier.toUpperCase()} · POCKET POST</span><span>NO. ${String(CARD_POOL.indexOf(c)+1).padStart(3,'0')}</span></div><div class="revealed-card-art">${c.emoji}<span>✦ ${c.power} PWR</span></div><h3>${c.name}</h3><p>${c.tier} · ${state.collection[c.id]?'Duplicate':'New discovery'}</p></article>`;
+  document.getElementById('unboxActions').innerHTML=`<button class="review-keep" data-review="keep" data-card="${c.id}"><span>▤</span><b>Collection</b><small>Keep this card</small></button><button class="review-sell" data-review="sell" data-card="${c.id}"><span>◉</span><b>Sell +${sellValue(c.id)}</b><small>Earn coins</small></button><button class="review-trash" data-review="trash" data-card="${c.id}"><span>⌫</span><b>Trash</b><small>Let it go</small></button>`;
+  document.getElementById('unboxDone').hidden=true;
 }
-function closeModal(){
-  document.querySelectorAll('.result-card:not(.resolved) .action-keep').forEach(btn=>{const id=btn.dataset.card;state.collection[id]=(state.collection[id]||1)+1;});
-  document.getElementById('packModal').classList.remove('show');document.getElementById('packModal').setAttribute('aria-hidden','true');persistRender();
+function resolveReview(button){
+  const id=button.dataset.card,action=button.dataset.review;
+  if(action==='keep')state.collection[id]=(state.collection[id]||0)+1;
+  if(action==='sell')state.coins+=sellValue(id);
+  state.activeReview.index++;
+  if(state.activeReview.index>=state.activeReview.cards.length){state.activeReview=null;document.getElementById('unboxTitle').textContent='All cards checked!';document.getElementById('unboxSubtitle').textContent='Your collection is updated. Head back to your cozy room.';document.getElementById('unboxCardStage').innerHTML='<div class="review-complete">✦<span>Beautiful discoveries,<br>carefully sorted.</span></div>';document.getElementById('unboxActions').innerHTML='';document.getElementById('unboxProgress').style.width='100%';document.getElementById('unboxDone').hidden=false;}
+  else showReviewCard();
+  save();render();renderRoom();
 }
-function rebirth(){if(state.level<15)return;const ok=confirm('Rebirth now? Your level, coins, and stored packs reset. Your card collection and luck bonus stay forever.');if(!ok)return;state.rebirths++;state.level=1;state.xp=0;state.coins=600;state.stored=[];state.huntTarget=null;persistRender();setView('rebirth');toast(`Rebirth ${state.rebirths}! Your card luck is now ${Math.round(state.rebirths*25)}% stronger.`);}
+function startUnbox(index=0){
+  if(state.activeReview){
+    document.getElementById('unboxOverlay').classList.add('show');document.getElementById('unboxOverlay').setAttribute('aria-hidden','false');showReviewCard();return;
+  }
+  const delivery=state.deliveries?.splice(index,1)[0];if(!delivery)return;
+  const cards=[];delivery.packs.forEach(id=>{for(let i=0;i<3;i++)cards.push(drawCard(id));});
+  state.packCount+=delivery.packs.length;
+  const levels=addXp(delivery.packs.length*45);notifyLevelUps(levels);
+  state.activeReview={cards,index:0};
+  if(state.huntTarget)state.huntTarget=null;
+  document.getElementById('unboxOverlay').classList.add('show');document.getElementById('unboxOverlay').setAttribute('aria-hidden','false');
+  document.getElementById('unboxKicker').textContent=`POCKET POST · ${delivery.packs.length} PACK${delivery.packs.length===1?'':'S'} DELIVERED`;
+  document.getElementById('unboxTitle').textContent='Unboxing your delivery…';document.getElementById('unboxSubtitle').textContent='Little wonders are on their way.';document.getElementById('unboxCardStage').innerHTML='<div class="unbox-box-animation">📦<span>✦</span></div>';document.getElementById('unboxActions').innerHTML='';document.getElementById('unboxDone').hidden=true;
+  save();render();renderRoom();
+  window.setTimeout(()=>{if(state.activeReview&&document.getElementById('unboxOverlay').classList.contains('show'))showReviewCard();},950);
+}
+function finishUnbox(){document.getElementById('unboxOverlay').classList.remove('show');document.getElementById('unboxOverlay').setAttribute('aria-hidden','true');renderRoom();}
+function rebirth(){if(state.level<15)return;const ok=confirm('Rebirth now? Your level, coins, and unopened deliveries reset. Your collection and any cards already being reviewed stay safe, and your luck bonus grows.');if(!ok)return;state.rebirths++;state.level=1;state.xp=0;state.coins=600;state.stored=[];state.deliveries=[];state.huntTarget=null;persistRender();setView('rebirth');toast(`Rebirth ${state.rebirths}! Your card luck is now ${Math.round(state.rebirths*25)}% stronger.`);}
 
 document.addEventListener('click',event=>{
   const nav=event.target.closest('[data-view]');if(nav){setView(nav.dataset.view);return;}
   const goto=event.target.closest('[data-goto]');if(goto){setView(goto.dataset.goto);return;}
-  const buy=event.target.closest('[data-buy]');if(buy){const p=buy.dataset.buy;const qty=document.getElementById(`qty-${p}`);buyPack(p,{amount:qty?Number(qty.value):1});return;}
-  const store=event.target.closest('[data-store]');if(store){buyPack(store.dataset.store,{store:true});return;}
-  const stored=event.target.closest('[data-open-stored]');if(stored){const index=Number(stored.dataset.openStored),pack=state.stored[index];if(pack){state.stored.splice(index,1);save();openPacks(pack,1);}return;}
-  const duplicate=event.target.closest('[data-duplicate]');if(duplicate){resolveDuplicate(duplicate);return;}
+  if(event.target.closest('[data-buy],[data-store]')){openPhone();return;}
+  const phoneOrder=event.target.closest('[data-phone-order]');if(phoneOrder){const quantity=phoneOrder.parentElement.querySelector('.order-quantity')?.value||1;buyPack(phoneOrder.dataset.phoneOrder,{amount:Number(quantity)});return;}
+  const delivery=event.target.closest('[data-room-delivery]');if(delivery){startUnbox(Number(delivery.dataset.roomDelivery));return;}
+    const review=event.target.closest('[data-review]');if(review){resolveReview(review);return;}
   const hunt=event.target.closest('[data-hunt]');if(hunt){state.huntTarget=hunt.dataset.hunt;persistRender();toast('Hunt target set! Your next pack has a better chance.');return;}
-  if(event.target.closest('[data-close]')){closeModal();return;}
-  if(event.target.id==='heroBuy'){buyPack('meadow');return;}
+    if(event.target.id==='heroBuy'){openPhone();return;}
+  if(event.target.id==='phoneButton'){openPhone();return;}
+  if(event.target.id==='phoneBack'||event.target===document.getElementById('phoneOverlay')){closePhone();return;}
+  if(event.target.id==='deliveryButton'){startUnbox();return;}
+  if(event.target.id==='unboxDone'){finishUnbox();return;}
+  if(event.target.id==='unboxClose'||event.target===document.getElementById('unboxOverlay')){finishUnbox();return;}
+  if(event.target.id==='storagePhoneButton'){openPhone();return;}
   if(event.target.id==='rebirthButton'){rebirth();return;}
 });
 document.getElementById('tierFilters').addEventListener('click',event=>{const button=event.target.closest('[data-tier]');if(!button)return;activeFilter=button.dataset.tier;document.querySelectorAll('.filter').forEach(b=>b.classList.toggle('active',b===button));renderCollection();});
 document.getElementById('clearHunt').addEventListener('click',()=>{state.huntTarget=null;persistRender();toast('Hunt target cleared.');});
 document.getElementById('earnCoins').addEventListener('click',()=>{if(state.welcomeClaimed){toast('Your welcome bonus has already been claimed.');return;}state.welcomeClaimed=true;state.coins+=250;persistRender();toast('Welcome bonus claimed: +250 coins!');});
 document.getElementById('menuToggle').addEventListener('click',()=>document.getElementById('sidebar').classList.toggle('open'));
-document.getElementById('packModal').addEventListener('click',event=>{if(event.target.id==='packModal')closeModal();});
-document.addEventListener('keydown',event=>{if(event.key==='Escape'&&document.getElementById('packModal').classList.contains('show'))closeModal();});
+document.getElementById('roomReturn').addEventListener('click',()=>document.getElementById('roomGame').scrollIntoView({behavior:'smooth',block:'start'}));
+document.addEventListener('keydown',event=>{if(event.key==='Escape'){if(document.getElementById('phoneOverlay').classList.contains('show'))closePhone();if(document.getElementById('unboxOverlay').classList.contains('show'))finishUnbox();}});
 function toast(message){const el=document.getElementById('toast');el.textContent=message;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),2500);}
 render();
