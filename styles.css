@@ -24,3 +24,29 @@
 @media(max-width:760px){.room-return-button{padding:7px 8px;font-size:10px}.room-return-button span{display:none}}
 @media(prefers-reduced-motion:reduce){.room-object,.phone-app,.unbox-panel,.unbox-overlay,.phone-overlay,.revealed-card{transition:none;animation:none}}
 
+/* Give the room true depth with layered CSS 3D planes and beveled furniture. */
+.room-scene{perspective:1200px;perspective-origin:50% 68%;transform-style:preserve-3d}
+.room-back-wall{transform:translateZ(-34px);transform-style:preserve-3d;box-shadow:inset 0 -12px 0 #e7cdb5,0 18px 35px #765b4430}
+.room-back-wall:before{content:"";position:absolute;z-index:-1;top:0;bottom:-8px;left:0;width:12%;background:linear-gradient(90deg,#d9c2af,#eee0d2);clip-path:polygon(0 0,100% 8%,100% 92%,0 100%);transform-origin:left center;transform:rotateY(52deg);filter:brightness(.92)}
+.room-back-wall:after{content:"";position:absolute;left:0;right:0;bottom:-9px;height:13px;background:linear-gradient(#edcfb3,#c49e7c);transform:rotateX(-8deg);transform-origin:top;box-shadow:0 6px 12px #795b4130}
+.room-floor{top:70%;inset-inline:-3%;transform:rotateX(42deg) translateZ(-18px);transform-origin:top center;background:repeating-linear-gradient(90deg,transparent 0 122px,#b9927445 123px 125px),linear-gradient(180deg,#dfc4a8,#c9a98b);box-shadow:inset 0 14px 20px #a17d5c28}
+.room-floor:before{background:repeating-linear-gradient(0deg,transparent 0 65px,#a9856740 66px 68px);mask-image:linear-gradient(180deg,#000 5%,#0008 70%,transparent)}
+.wall-window,.wall-poster{transform:translateZ(2px)}
+.poster-one{transform:translateZ(3px) rotate(-5deg)}.poster-two{transform:translateZ(3px) rotate(5deg)}
+.shelf{transform:translateZ(8px) rotateX(7deg);transform-origin:center bottom;box-shadow:0 5px 0 #8e6549,0 9px 13px #65412820,0 15px 20px #65412818}
+.shelf:after{content:"";position:absolute;left:3px;right:3px;bottom:-7px;height:7px;border-radius:0 0 3px 3px;background:linear-gradient(#9b704f,#80583e);transform:rotateX(-35deg);transform-origin:top}
+.shelf-top{transform:translateZ(8px) rotateX(7deg)}.shelf-bottom{transform:translateZ(8px) rotateX(7deg)}
+.desk{transform:perspective(900px) rotateX(5deg) translateZ(22px);transform-origin:center bottom;filter:drop-shadow(0 17px 16px #68462524)}
+.desk-top{transform-style:preserve-3d;box-shadow:0 12px 0 #a97650,0 17px 0 #996a48,0 23px 28px #68462530}
+.desk-top:after{content:"";position:absolute;left:8px;right:8px;bottom:-15px;height:14px;border-radius:0 0 5px 5px;background:linear-gradient(180deg,#ad7952,#8e6245);transform:rotateX(-18deg);transform-origin:top;box-shadow:0 7px 8px #68462525}
+.desk-mat{box-shadow:inset 0 2px 3px #fff8,0 5px 8px #675a4b18;transform:perspective(250px) rotateX(3deg) skew(-7deg)}
+.desk-leg{box-shadow:inset 4px 0 #ffffff17,3px 5px 8px #65452a20}
+.desk-lamp,.desk-plant,.phone-object,.delivery-object,.room-chair{transform-style:preserve-3d}
+.phone-object,.delivery-object{filter:drop-shadow(0 12px 8px #68482c45)}
+.phone-device{transform:rotate(-12deg) rotateX(7deg) translateZ(16px);box-shadow:inset 0 0 0 2px #aaa3a5,5px 8px 0 #38353d,8px 12px 12px #3e302b42}
+.delivery-box{transform:rotateX(5deg) translateZ(12px);box-shadow:0 8px 0 #b88d55,0 13px 15px #674b2c35}
+.room-chair{filter:drop-shadow(0 12px 10px #68482c28)}
+@media(max-width:900px){.shelf-top,.shelf-bottom{transform:scale(.92) translateZ(8px) rotateX(7deg)}}
+@media(max-width:600px){.room-scene{perspective:900px}.room-back-wall{transform:translateZ(-24px)}.room-floor{top:73%;transform:rotateX(35deg) translateZ(-12px)}.shelf-top,.shelf-bottom{transform:scale(.7) translateZ(8px) rotateX(7deg)}.desk{transform:perspective(700px) rotateX(4deg) translateZ(12px)}.phone-device{transform:rotate(-12deg) rotateX(7deg) translateZ(10px)}.delivery-box{transform:rotateX(5deg) translateZ(8px)}}
+@media(prefers-reduced-motion:reduce){.room-object:hover{transform:none}}
+
