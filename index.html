@@ -12,6 +12,24 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+  <div class="room-game" id="roomGame">
+    <div class="room-hud"><div class="room-brand"><span>✦</span> POCKET ROOM</div><nav class="room-tools" aria-label="Room shortcuts"><button data-view="collection">▤ <span>Collection</span></button><button data-view="packs">✦ <span>Workshop</span></button></nav><div class="room-wallet">◉ <b id="roomCoins">600</b><span>coins</span><i></i> LV <b id="roomLevel">1</b></div></div>
+    <div class="room-caption"><span>YOUR LITTLE COLLECTOR'S ROOM</span><h1>A cozy place for<br><em>big discoveries.</em></h1><p>Tap the phone to order cards. Your delivery will land right on the desk.</p></div>
+    <div class="room-scene" id="roomScene" aria-label="A 3D-style collector's room">
+      <div class="room-back-wall"><div class="wall-window"><div class="window-sky"></div><span class="window-cloud cloud-one"></span><span class="window-cloud cloud-two"></span><div class="window-sill"></div></div><div class="wall-poster poster-one"><span>✦</span><small>COLLECT<br>HAPPY THINGS</small></div><div class="wall-poster poster-two"><span>🌙</span><small>WONDER<br>AFTER DARK</small></div>
+        <div class="shelf shelf-top"><div class="shelf-books"><i></i><i></i><i></i><i></i></div><div class="shelf-toy">🦊</div><div class="shelf-plant">🪴</div></div><div class="shelf shelf-bottom"><div class="shelf-box">✦</div><div class="shelf-books"><i></i><i></i><i></i></div><div class="shelf-trophy">🏆</div></div>
+      </div>
+      <div class="room-floor"></div><div class="desk"><div class="desk-top"><div class="desk-mat"></div><div class="desk-drawer"><span>✦</span></div><div class="desk-leg leg-left"></div><div class="desk-leg leg-right"></div></div></div>
+      <div class="desk-lamp"><div class="lamp-shade"></div><div class="lamp-arm"></div><div class="lamp-base"></div></div><div class="desk-plant">🪴</div>
+      <button class="room-object phone-object" id="phoneButton" aria-label="Pick up phone"><span class="object-hint">PICK UP PHONE</span><span class="phone-device"><span class="phone-camera"></span><span class="phone-screen"><b>◉</b><small>ORDERMART</small><i>✦</i></span><span class="phone-home"></span></span><span class="phone-glow"></span></button>
+      <button class="room-object delivery-object" id="deliveryButton" aria-label="Open card delivery" hidden><span class="object-hint">YOUR DELIVERY · CLICK TO UNBOX</span><span class="delivery-box"><i>✦</i><b>POCKET<br>POST</b><small>FRAGILE · MAGIC INSIDE</small><span class="box-tape"></span></span><span class="delivery-glow"></span></button>
+      <div class="room-chair"><div class="chair-back"></div><div class="chair-seat"></div><div class="chair-post"></div><div class="chair-base"></div></div>
+    </div>
+    <div class="room-help"><span>✦</span> Your room, your collection. Everything saves automatically.</div>
+    <div class="phone-overlay" id="phoneOverlay" aria-hidden="true"><div class="phone-app"><div class="phone-app-top"><button id="phoneBack" aria-label="Close phone">‹</button><span>ORDERMART</span><span class="phone-signal">●●●</span></div><div class="phone-app-content" id="phoneContent"></div></div></div>
+    <div class="unbox-overlay" id="unboxOverlay" aria-hidden="true"><div class="unbox-panel"><button class="unbox-close" id="unboxClose" aria-label="Close unboxing">×</button><div class="unbox-kicker" id="unboxKicker">POCKET POST · DELIVERY</div><h2 id="unboxTitle">A little box of wonder!</h2><p id="unboxSubtitle">Your cards are ready to meet you.</p><div class="unbox-progress"><span id="unboxProgress"></span></div><div class="unbox-card-stage" id="unboxCardStage"></div><div class="unbox-actions" id="unboxActions"></div><button class="button button-dark unbox-done" id="unboxDone" hidden>Back to my room <span>↗</span></button></div></div>
+    <div class="room-toast" id="roomToast" role="status"></div>
+  </div>
   <div class="app-shell">
     <aside class="sidebar" id="sidebar">
       <a class="brand" href="#packs" aria-label="Mythic Pocket home">
@@ -42,6 +60,7 @@
     <main class="main-content">
       <header class="topbar">
         <button class="mobile-menu" id="menuToggle" aria-label="Open menu">☰</button>
+        <button class="room-return-button" id="roomReturn" aria-label="Return to your room">↖ <span>Room</span></button>
         <div class="breadcrumb"><span>WORKSHOP</span><b>/</b><strong id="crumbTitle">Pack shop</strong></div>
         <div class="top-stats">
           <div class="currency"><span class="coin-icon">◉</span><span id="coinBalance">0</span><small>COINS</small><button class="plus-btn" id="earnCoins" aria-label="Claim welcome coins">+</button></div>
@@ -79,8 +98,8 @@
         </section>
 
         <section class="view" id="view-storage">
-          <div class="page-heading"><div><div class="eyebrow"><span class="eyebrow-line"></span> SAVED FOR LATER</div><h1>Pack storage</h1><p class="lead">Keep your sealed packs safe until you're ready for a surprise.</p></div><div class="storage-count"><b id="storageCount">0</b><span>SEALED PACKS</span></div></div>
-          <div class="storage-banner"><div class="storage-illustration">▤</div><div><strong>Your unopened discoveries</strong><p>Buy packs from the shop and store them here, then open them whenever you like.</p></div><button class="button button-dark" data-goto="packs">Visit the shop <span>↗</span></button></div>
+          <div class="page-heading"><div><div class="eyebrow"><span class="eyebrow-line"></span> SAVED FOR LATER</div><h1>Pack storage</h1><p class="lead">Every order waits here on your desk until you're ready to unbox.</p></div><div class="storage-count"><b id="storageCount">0</b><span>SEALED PACKS</span></div></div>
+          <div class="storage-banner"><div class="storage-illustration">▤</div><div><strong>Your incoming discoveries</strong><p>Unopened deliveries stay on your desk until you decide to open them.</p></div><button class="button button-dark" data-goto="packs">Visit the shop <span>↗</span></button></div>
           <div class="stored-list" id="storedList"></div>
         </section>
 
@@ -98,7 +117,6 @@
     </main>
   </div>
 
-  <div class="modal-backdrop" id="packModal" aria-hidden="true"><div class="modal pack-modal" role="dialog" aria-modal="true" aria-labelledby="packModalTitle"><button class="modal-close" data-close aria-label="Close">×</button><div class="modal-kicker">WILD HORIZONS · PACK OPENED</div><h2 id="packModalTitle">Look what you found!</h2><p class="modal-subtitle" id="packModalSubtitle">Three new friends are ready to meet you.</p><div class="result-cards" id="resultCards"></div><div class="modal-bottom"><span id="resultXp">✦ +45 XP earned</span><button class="button button-dark" data-close>Lovely! <span>↗</span></button></div></div></div>
   <div class="toast" id="toast" role="status"></div>
   <script src="game.js"></script>
 </body>
