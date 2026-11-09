@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#171624">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <title>Mythic Pocket — Card Collector</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="#packs" aria-label="Mythic Pocket home">
+        <span class="brand-mark"><span>✦</span></span>
+        <span class="brand-copy">mythic<span>pocket</span></span>
+      </a>
+      <div class="side-label">YOUR WORKSHOP</div>
+      <nav class="main-nav" aria-label="Main navigation">
+        <button class="nav-link active" data-view="packs"><span class="nav-icon">▣</span> Pack shop <span class="nav-arrow">›</span></button>
+        <button class="nav-link" data-view="collection"><span class="nav-icon">▤</span> Collection <span class="nav-count" id="collectionNavCount">0</span></button>
+        <button class="nav-link locked-nav" data-view="journal" data-unlock="2"><span class="nav-icon">◷</span> Journal <span class="lock-icon">⌑</span></button>
+        <button class="nav-link locked-nav" data-view="storage" data-unlock="5"><span class="nav-icon">▣</span> Pack storage <span class="lock-icon">⌑</span></button>
+        <button class="nav-link locked-nav" data-view="hunting" data-unlock="12"><span class="nav-icon">⌕</span> Card hunting <span class="lock-icon">⌑</span></button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="side-label">YOUR JOURNEY</div>
+        <div class="journey-card">
+          <div class="journey-top"><span class="journey-gem">✧</span><span>RESEARCH NOTES</span></div>
+          <p>Every great collection starts with one pack.</p>
+          <div class="mini-progress"><span id="sideProgress"></span></div>
+          <div class="journey-foot"><span id="sideLevel">Level 1</span><span id="sideNext">Level 2</span></div>
+        </div>
+        <button class="nav-link rebirth-nav" data-view="rebirth"><span class="nav-icon">⟳</span> Rebirth <span class="nav-arrow">›</span></button>
+        <div class="profile"><div class="avatar">✦</div><div><strong>New Trainer</strong><small>Collector in training</small></div><span class="profile-more">•••</span></div>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <button class="mobile-menu" id="menuToggle" aria-label="Open menu">☰</button>
+        <div class="breadcrumb"><span>WORKSHOP</span><b>/</b><strong id="crumbTitle">Pack shop</strong></div>
+        <div class="top-stats">
+          <div class="currency"><span class="coin-icon">◉</span><span id="coinBalance">0</span><small>COINS</small><button class="plus-btn" id="earnCoins" aria-label="Claim welcome coins">+</button></div>
+          <div class="top-divider"></div>
+          <div class="level-pill"><span class="level-star">✦</span><span>LVL <b id="levelNumber">1</b></span></div>
+        </div>
+      </header>
+
+      <div class="page-wrap">
+        <section class="view active" id="view-packs">
+          <div class="welcome-row">
+            <div><div class="eyebrow"><span class="eyebrow-line"></span> THE COLLECTOR'S CLUB</div><h1>Find your next <em>favorite.</em></h1><p class="lead">Rip open a pack. Meet a new legend. Build a collection that's yours.</p></div>
+            <div class="trainer-stamp"><div class="stamp-orbit">✦</div><div><small>YOUR ADVENTURE</small><strong>STARTS HERE</strong></div></div>
+          </div>
+          <div class="hero-panel">
+            <div class="hero-copy"><span class="hero-tag"><span class="sparkle">✦</span> NEW SEASON · SET 01</span><h2>Wild Horizons</h2><p>Seven little surprises in every pack. Which rare friend will find you?</p><div class="hero-bottom"><div class="pack-price"><span class="coin-icon">◉</span><strong>120</strong><span>coins / pack</span></div><button class="button button-light" id="heroBuy">Get a pack <span>↗</span></button></div></div>
+            <div class="hero-art" aria-hidden="true"><div class="sun-halo"></div><div class="orbit orbit-a"></div><div class="orbit orbit-b"></div><div class="hero-spark s1">✦</div><div class="hero-spark s2">✧</div><div class="hero-spark s3">✦</div><div class="hero-creature">🦊</div><div class="hero-leaf leaf-a">✳</div><div class="hero-leaf leaf-b">✦</div><div class="hero-caption">A LITTLE<br>WILD MAGIC</div></div>
+            <div class="hero-index"><span>01</span><i></i><span>03</span></div>
+          </div>
+          <div class="section-heading"><div><div class="eyebrow"><span class="eyebrow-line"></span> PICK YOUR ADVENTURE</div><h2>Choose a pack</h2></div><div class="packs-subtitle">Each pack contains <b>3 cards</b> <span>✦</span></div></div>
+          <div class="pack-grid" id="packGrid"></div>
+          <div class="below-grid"><div class="tip-card"><span class="tip-icon">✧</span><div><strong>Collector's tip</strong><p>Duplicates can be sold for coins or sent to the trash after opening.</p></div><span class="tip-arrow">↗</span></div><div class="unlock-nudge"><span>✦</span><p>Your next unlock: <b id="nextUnlockName">Collection journal</b></p><span class="unlock-level" id="nextUnlockLevel">LVL 2</span></div></div>
+        </section>
+
+        <section class="view" id="view-collection">
+          <div class="page-heading"><div><div class="eyebrow"><span class="eyebrow-line"></span> YOUR PERSONAL ARCHIVE</div><h1>Card collection</h1><p class="lead">Every new face is a story worth keeping.</p></div><div class="collection-total"><b id="collectionTotal">0</b><span>UNIQUE CARDS</span></div></div>
+          <div class="collection-toolbar"><div class="filter-tabs" id="tierFilters"><button class="filter active" data-tier="all">All cards <span id="allCount">0</span></button><button class="filter" data-tier="Normal">Normal</button><button class="filter" data-tier="Gold">Gold</button><button class="filter" data-tier="Rare">Rare</button><button class="filter" data-tier="Diamond">Diamond</button><button class="filter" data-tier="Godlike">Godlike</button><button class="filter" data-tier="Special">Special</button><button class="filter" data-tier="Secret">Secret</button></div><div class="sort-label">SORT <span>NEWEST ↓</span></div></div>
+          <div class="collection-grid" id="collectionGrid"></div>
+        </section>
+
+        <section class="view" id="view-journal">
+          <div class="page-heading"><div><div class="eyebrow"><span class="eyebrow-line"></span> FIELD NOTES</div><h1>Collection journal</h1><p class="lead">A living guide to every creature you've met.</p></div><div class="collection-total"><b id="journalCount">0</b><span>DISCOVERED</span></div></div>
+          <div class="journal-banner"><span>✧</span><div><strong>The world is full of little wonders.</strong><p>Discover creatures to fill their pages. Unknown friends are waiting out there.</p></div></div>
+          <div class="collection-grid" id="journalGrid"></div>
+        </section>
+
+        <section class="view" id="view-storage">
+          <div class="page-heading"><div><div class="eyebrow"><span class="eyebrow-line"></span> SAVED FOR LATER</div><h1>Pack storage</h1><p class="lead">Keep your sealed packs safe until you're ready for a surprise.</p></div><div class="storage-count"><b id="storageCount">0</b><span>SEALED PACKS</span></div></div>
+          <div class="storage-banner"><div class="storage-illustration">▤</div><div><strong>Your unopened discoveries</strong><p>Buy packs from the shop and store them here, then open them whenever you like.</p></div><button class="button button-dark" data-goto="packs">Visit the shop <span>↗</span></button></div>
+          <div class="stored-list" id="storedList"></div>
+        </section>
+
+        <section class="view" id="view-hunting">
+          <div class="page-heading"><div><div class="eyebrow"><span class="eyebrow-line"></span> SPECIAL RESEARCH</div><h1>Card hunting</h1><p class="lead">Pick a creature to focus your search. Good things come to patient collectors.</p></div><div class="hunt-badge">⌕ <span>HUNT MODE</span></div></div>
+          <div class="hunt-panel"><div class="hunt-panel-head"><span class="hunt-icon">⌕</span><div><h2>Who are you looking for?</h2><p>Choose a card you've discovered to add a small chance of finding it in your next pack.</p></div></div><div class="hunt-options" id="huntOptions"></div><div class="hunt-footer"><span id="huntStatus">Select a creature to begin your search.</span><button class="button button-dark" id="clearHunt">Clear target</button></div></div>
+        </section>
+
+        <section class="view" id="view-rebirth">
+          <div class="page-heading"><div><div class="eyebrow"><span class="eyebrow-line"></span> A NEW BEGINNING</div><h1>Rebirth</h1><p class="lead">Start a fresh journey with the wisdom of every adventure before.</p></div><div class="rebirth-count"><span>✦</span><b id="rebirthCount">0</b><small>REBIRTHS</small></div></div>
+          <div class="rebirth-panel"><div class="rebirth-art"><div class="rebirth-orb">⟳</div><span class="orb-ring ring-one"></span><span class="orb-ring ring-two"></span></div><div class="rebirth-copy"><span class="hero-tag">A LEGENDARY RESET</span><h2>Come back <em>stronger.</em></h2><p>Reach level 15 to rebirth. You'll begin again with starter coins, but your collection stays—and your luck grows forever.</p><div class="rebirth-perks"><div><span>✦</span><b>+25% better odds</b><small>Each rebirth boosts card luck</small></div><div><span>▤</span><b>Keep your collection</b><small>Your discoveries are forever</small></div><div><span>↻</span><b>Fresh start</b><small>Level and coins reset</small></div></div><div class="rebirth-progress"><div class="progress-label"><span>YOUR PROGRESS</span><b id="rebirthRequirement">Level 1 / 15</b></div><div class="wide-progress"><span id="rebirthProgress"></span></div></div><button class="button button-dark" id="rebirthButton" disabled>Rebirth unavailable <span>↗</span></button></div></div>
+          <p class="rebirth-note">Your cards are never lost. Rebirth resets your level, coins, and stored packs.</p>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <div class="modal-backdrop" id="packModal" aria-hidden="true"><div class="modal pack-modal" role="dialog" aria-modal="true" aria-labelledby="packModalTitle"><button class="modal-close" data-close aria-label="Close">×</button><div class="modal-kicker">WILD HORIZONS · PACK OPENED</div><h2 id="packModalTitle">Look what you found!</h2><p class="modal-subtitle" id="packModalSubtitle">Three new friends are ready to meet you.</p><div class="result-cards" id="resultCards"></div><div class="modal-bottom"><span id="resultXp">✦ +45 XP earned</span><button class="button button-dark" data-close>Lovely! <span>↗</span></button></div></div></div>
+  <div class="toast" id="toast" role="status"></div>
+  <script src="game.js"></script>
+</body>
+</html>
