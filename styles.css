@@ -50,3 +50,54 @@
 @media(max-width:600px){.room-scene{perspective:900px}.room-back-wall{transform:translateZ(-24px)}.room-floor{top:73%;transform:rotateX(35deg) translateZ(-12px)}.shelf-top,.shelf-bottom{transform:scale(.7) translateZ(8px) rotateX(7deg)}.desk{transform:perspective(700px) rotateX(4deg) translateZ(12px)}.phone-device{transform:rotate(-12deg) rotateX(7deg) translateZ(10px)}.delivery-box{transform:rotateX(5deg) translateZ(8px)}}
 @media(prefers-reduced-motion:reduce){.room-object:hover{transform:none}}
 
+/* Iridescent, sculpted CGI-style card illustrations. */
+.cgi-card-art{isolation:isolate;background:radial-gradient(ellipse at 50% 80%,#fff8 0 2%,transparent 42%),radial-gradient(ellipse at 50% 110%,hsl(var(--art-hue) 52% 42%),transparent 65%),linear-gradient(145deg,hsl(var(--art-hue) 78% 80%),hsl(var(--art-accent) 70% 59%) 58%,hsl(var(--art-hue) 48% 42%));box-shadow:inset 0 1px #fff9,inset 0 -18px 30px #211d3725}
+.cgi-card-art:before{content:"";top:15%;width:68%;height:68%;border:1px solid #ffffff88;border-radius:48% 52% 50% 50%;background:radial-gradient(ellipse at 50% 70%,#fff2,transparent 58%);box-shadow:0 0 24px #fff5,inset 0 0 22px #ffffff18;transform:rotate(calc(var(--art-seed)*3deg))}
+.cgi-card-art:after{width:88%;height:38%;border:1px solid #ffffffb0;border-radius:50%;box-shadow:0 0 10px #fff7;transform:rotate(calc(var(--art-seed)*7deg - 35deg));top:43%}
+.cgi-card-art .cgi-orbit{position:absolute;z-index:1;width:90%;height:31%;border:1px solid #fff9;border-radius:50%;transform:rotate(-28deg);box-shadow:0 0 8px #fff7;pointer-events:none}
+.cgi-card-art .cgi-orbit-two{width:72%;height:52%;border-color:#ffffff75;transform:rotate(46deg)}
+.cgi-card-art .cgi-sprite{z-index:2;display:grid;place-items:center;width:1.55em;height:1.55em;border-radius:48% 52% 46% 54%;font-size:clamp(54px,7vw,82px);line-height:1;background:radial-gradient(ellipse at 32% 24%,#fff 0 5%,#ffffffa8 9%,transparent 28%),radial-gradient(ellipse at 42% 34%,hsl(var(--art-hue) 78% 96%) 0 12%,hsl(var(--art-hue) 65% 81%) 32%,hsl(var(--art-accent) 65% 58%) 68%,hsl(var(--art-hue) 65% 39%) 100%);background-clip:text;-webkit-background-clip:text;color:transparent;-webkit-text-stroke:1px #ffffffa8;filter:drop-shadow(0 7px 3px #33274755) drop-shadow(0 0 13px #fff9);transform:translateY(-2px) rotate(calc(var(--art-seed)*2deg - 10deg));animation:sprite-float 3.2s ease-in-out infinite alternate}
+.cgi-particle{position:absolute;z-index:3;color:#fff;text-shadow:0 0 10px #fff;font-size:17px;animation:particle-pulse 2s ease-in-out infinite alternate;pointer-events:none}.particle-one{top:26%;right:20%}.particle-two{left:18%;bottom:23%;font-size:13px;animation-delay:.7s}
+.cgi-card-art small{z-index:4;text-shadow:0 1px 5px #47385570}
+@keyframes sprite-float{to{transform:translateY(-8px) rotate(calc(var(--art-seed)*2deg - 6deg)) scale(1.035)}}
+@keyframes particle-pulse{to{opacity:.45;transform:scale(.7) rotate(25deg)}}
+.hunt-creature-wrap{display:block;flex:0 0 48px;width:48px;height:48px;overflow:hidden;border-radius:8px;box-shadow:0 3px 8px #42334a20}
+.hunt-creature-wrap .creature-art{width:100%;height:100%;border-radius:8px}
+.hunt-creature-wrap .creature-art small{display:none}
+.hunt-creature-wrap .cgi-card-art:before{width:68%;height:68%;top:16%}
+.hunt-creature-wrap .cgi-card-art:after{width:85%;height:34%}
+.hunt-creature-wrap .cgi-card-art .cgi-sprite{font-size:27px}
+.hunt-creature-wrap .cgi-particle{font-size:9px}
+.revealed-card-art{overflow:hidden;background:transparent}
+.revealed-card-art>.creature-art{position:absolute;inset:0;width:100%;height:100%;margin:0;border-radius:9px}
+.revealed-card-art>.creature-art small{left:9px;top:8px}
+.revealed-card-art>.creature-art .cgi-sprite{font-size:82px}
+.revealed-card-art>span{z-index:5}
+.battle-panel{padding:24px;border:1px solid #ece8f0;border-radius:16px;background:linear-gradient(145deg,#fff,#fbf9fd);box-shadow:0 12px 32px #30243c0b}
+.battle-arena{display:grid;grid-template-columns:minmax(0,1fr) 54px minmax(0,1fr);align-items:center;gap:15px;padding:22px;border:1px solid #eee9f2;border-radius:15px;background:radial-gradient(ellipse at 50% 100%,#e5ddf1 0,transparent 55%),linear-gradient(135deg,#f8f6fb,#fff 55%,#f4f8f4)}
+.battle-side{display:grid;justify-items:center;gap:10px;min-width:0}.battle-side>small{font-size:8px;font-weight:800;letter-spacing:1.4px;color:#8a8295}
+.battle-slot{display:grid;place-items:center;width:100%;min-height:230px;padding:12px;border:1px dashed #d9d3e2;border-radius:12px;background:#ffffffa8;color:#9992a0;text-align:center;font-size:11px}
+.battle-placeholder{max-width:130px;line-height:1.6}
+.battle-versus{display:grid;place-items:center;width:42px;height:42px;border-radius:50%;background:#6e5ec9;color:#fff;font:700 12px 'Space Grotesk';box-shadow:0 6px 15px #6856d844}
+.battle-card-face{width:min(190px,100%);padding:8px;border:1px solid #e8dfd2;border-radius:11px;background:#fff;box-shadow:0 8px 18px #3a2b4720;text-align:center;animation:card-pop .35s ease-out}
+.battle-card-face>.creature-art{height:150px;border-radius:7px}
+.battle-card-face .cgi-sprite{font-size:68px}
+.battle-card-face>strong{display:block;margin:8px 0 3px;color:#403b49;font:700 12px 'Space Grotesk'}
+.battle-card-face>span{color:#8e7c9a;font-size:8px;font-weight:800}
+.battle-message{min-height:18px;margin:17px 0;color:#7e7485;text-align:center;font-size:11px}
+.battle-team{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:10px;max-height:300px;overflow:auto;padding:3px 3px 10px}
+.battle-pick{min-width:0;padding:7px;border:1px solid #ebe7ef;border-radius:10px;background:#fff;text-align:left;transition:transform .18s,border-color .18s,box-shadow .18s}
+.battle-pick:hover{transform:translateY(-3px);border-color:#c1b6ec;box-shadow:0 8px 18px #473b5715}
+.battle-pick.selected{border-color:#7868d5;box-shadow:0 0 0 2px #7868d528,0 8px 18px #473b5715;background:#fbfaff}
+.battle-pick .creature-art{height:95px;border-radius:7px}
+.battle-pick .creature-art small{font-size:6px;top:5px;left:6px}
+.battle-pick .cgi-sprite{font-size:54px}
+.battle-pick>strong,.battle-pick>small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.battle-pick>strong{margin:7px 1px 3px;font:700 10px 'Space Grotesk'}
+.battle-pick>small{margin:0 1px;color:#8c8294;font-size:8px}
+.battle-empty{grid-column:1/-1;padding:24px;border:1px dashed #ddd6e6;border-radius:10px;color:#8b8290;text-align:center;font-size:11px}
+.battle-start{display:flex;align-items:center;justify-content:center;gap:10px;min-width:220px;margin:9px auto 0}
+.battle-start:disabled{opacity:.55;cursor:not-allowed}
+@media(max-width:600px){.battle-panel{padding:13px}.battle-arena{grid-template-columns:minmax(0,1fr) 34px minmax(0,1fr);gap:7px;padding:12px 7px}.battle-versus{width:32px;height:32px;font-size:9px}.battle-slot{min-height:180px;padding:7px}.battle-card-face{padding:5px}.battle-card-face>.creature-art{height:115px}.battle-card-face .cgi-sprite{font-size:56px}.battle-team{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.battle-pick{padding:5px}.battle-pick .creature-art{height:76px}.battle-pick .cgi-sprite{font-size:43px}.battle-pick>strong{font-size:9px}.battle-start{min-width:0;width:100%}.hunt-creature-wrap{flex-basis:40px;width:40px;height:40px}.revealed-card-art>.creature-art .cgi-sprite{font-size:68px}}
+@media(prefers-reduced-motion:reduce){.cgi-card-art .cgi-sprite,.cgi-particle{animation:none}}
+

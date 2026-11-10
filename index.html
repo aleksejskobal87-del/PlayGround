@@ -13,7 +13,7 @@
 </head>
 <body>
   <div class="room-game" id="roomGame">
-    <div class="room-hud"><div class="room-brand"><span>✦</span> POCKET ROOM</div><nav class="room-tools" aria-label="Room shortcuts"><button data-view="collection">▤ <span>Collection</span></button><button data-view="packs">✦ <span>Workshop</span></button></nav><div class="room-wallet">◉ <b id="roomCoins">600</b><span>coins</span><i></i> LV <b id="roomLevel">1</b></div></div>
+    <div class="room-hud"><div class="room-brand"><span>✦</span> POCKET ROOM</div><nav class="room-tools" aria-label="Room shortcuts"><button data-view="collection">▤ <span>Collection</span></button><button data-open-phone>✦ <span>Ordermart</span></button></nav><div class="room-wallet">◉ <b id="roomCoins">600</b><span>coins</span><i></i> LV <b id="roomLevel">1</b></div></div>
     <div class="room-caption"><span>YOUR LITTLE COLLECTOR'S ROOM</span><h1>A cozy place for<br><em>big discoveries.</em></h1><p>Tap the phone to order cards. Your delivery will land right on the desk.</p></div>
     <div class="room-scene" id="roomScene" aria-label="A 3D-style collector's room">
       <div class="room-back-wall"><div class="wall-window"><div class="window-sky"></div><span class="window-cloud cloud-one"></span><span class="window-cloud cloud-two"></span><div class="window-sill"></div></div><div class="wall-poster poster-one"><span>✦</span><small>COLLECT<br>HAPPY THINGS</small></div><div class="wall-poster poster-two"><span>🌙</span><small>WONDER<br>AFTER DARK</small></div>
@@ -38,11 +38,12 @@
       </a>
       <div class="side-label">YOUR WORKSHOP</div>
       <nav class="main-nav" aria-label="Main navigation">
-        <button class="nav-link active" data-view="packs"><span class="nav-icon">▣</span> Pack shop <span class="nav-arrow">›</span></button>
-        <button class="nav-link" data-view="collection"><span class="nav-icon">▤</span> Collection <span class="nav-count" id="collectionNavCount">0</span></button>
+        <button class="nav-link" data-open-phone><span class="nav-icon">◉</span> Ordermart <span class="nav-arrow">↗</span></button>
+        <button class="nav-link active" data-view="collection"><span class="nav-icon">▤</span> Collection <span class="nav-count" id="collectionNavCount">0</span></button>
         <button class="nav-link locked-nav" data-view="journal" data-unlock="2"><span class="nav-icon">◷</span> Journal <span class="lock-icon">⌑</span></button>
         <button class="nav-link locked-nav" data-view="storage" data-unlock="5"><span class="nav-icon">▣</span> Pack storage <span class="lock-icon">⌑</span></button>
         <button class="nav-link locked-nav" data-view="hunting" data-unlock="12"><span class="nav-icon">⌕</span> Card hunting <span class="lock-icon">⌑</span></button>
+        <button class="nav-link locked-nav" data-view="battle" data-unlock="13"><span class="nav-icon">⚔</span> Battle arena <span class="lock-icon">⌑</span></button>
       </nav>
       <div class="sidebar-bottom">
         <div class="side-label">YOUR JOURNEY</div>
@@ -70,7 +71,7 @@
       </header>
 
       <div class="page-wrap">
-        <section class="view active" id="view-packs">
+        <section class="view" id="view-packs" hidden>
           <div class="welcome-row">
             <div><div class="eyebrow"><span class="eyebrow-line"></span> THE COLLECTOR'S CLUB</div><h1>Find your next <em>favorite.</em></h1><p class="lead">Rip open a pack. Meet a new legend. Build a collection that's yours.</p></div>
             <div class="trainer-stamp"><div class="stamp-orbit">✦</div><div><small>YOUR ADVENTURE</small><strong>STARTS HERE</strong></div></div>
@@ -85,7 +86,7 @@
           <div class="below-grid"><div class="tip-card"><span class="tip-icon">✧</span><div><strong>Collector's tip</strong><p>Duplicates can be sold for coins or sent to the trash after opening.</p></div><span class="tip-arrow">↗</span></div><div class="unlock-nudge"><span>✦</span><p>Your next unlock: <b id="nextUnlockName">Collection journal</b></p><span class="unlock-level" id="nextUnlockLevel">LVL 2</span></div></div>
         </section>
 
-        <section class="view" id="view-collection">
+        <section class="view active" id="view-collection">
           <div class="page-heading"><div><div class="eyebrow"><span class="eyebrow-line"></span> YOUR PERSONAL ARCHIVE</div><h1>Card collection</h1><p class="lead">Every new face is a story worth keeping.</p></div><div class="collection-total"><b id="collectionTotal">0</b><span>UNIQUE CARDS</span></div></div>
           <div class="collection-toolbar"><div class="filter-tabs" id="tierFilters"><button class="filter active" data-tier="all">All cards <span id="allCount">0</span></button><button class="filter" data-tier="Normal">Normal</button><button class="filter" data-tier="Gold">Gold</button><button class="filter" data-tier="Rare">Rare</button><button class="filter" data-tier="Diamond">Diamond</button><button class="filter" data-tier="Godlike">Godlike</button><button class="filter" data-tier="Special">Special</button><button class="filter" data-tier="Secret">Secret</button></div><div class="sort-label">SORT <span>NEWEST ↓</span></div></div>
           <div class="collection-grid" id="collectionGrid"></div>
@@ -106,6 +107,11 @@
         <section class="view" id="view-hunting">
           <div class="page-heading"><div><div class="eyebrow"><span class="eyebrow-line"></span> SPECIAL RESEARCH</div><h1>Card hunting</h1><p class="lead">Pick a creature to focus your search. Good things come to patient collectors.</p></div><div class="hunt-badge">⌕ <span>HUNT MODE</span></div></div>
           <div class="hunt-panel"><div class="hunt-panel-head"><span class="hunt-icon">⌕</span><div><h2>Who are you looking for?</h2><p>Choose a card you've discovered to add a small chance of finding it in your next pack.</p></div></div><div class="hunt-options" id="huntOptions"></div><div class="hunt-footer"><span id="huntStatus">Select a creature to begin your search.</span><button class="button button-dark" id="clearHunt">Clear target</button></div></div>
+        </section>
+
+        <section class="view" id="view-battle">
+          <div class="page-heading"><div><div class="eyebrow"><span class="eyebrow-line"></span> FRIENDLY DUELS · UNLOCKS AT LEVEL 13</div><h1>Battle arena</h1><p class="lead">Choose a card from your collection and see how it fares in a friendly duel.</p></div><div class="hunt-badge">⚔ <span>DUEL MODE</span></div></div>
+          <div class="battle-panel"><div class="battle-arena" id="battleArena"><div class="battle-side"><small>YOUR CHAMPION</small><div class="battle-slot" id="battlePlayerSlot">Choose a card below</div></div><div class="battle-versus">VS</div><div class="battle-side"><small>CHALLENGER</small><div class="battle-slot" id="battleOpponentSlot">Ready when you are</div></div></div><p class="battle-message" id="battleMessage">Pick one of your discovered cards to start a friendly battle.</p><div class="battle-team" id="battleTeam"></div><button class="button button-dark battle-start" id="battleStart" disabled>Choose your champion <span>↗</span></button></div>
         </section>
 
         <section class="view" id="view-rebirth">

@@ -62,11 +62,14 @@ const UNLOCKS = [
   {level:5,name:'Pack storage',view:'storage'},
   {level:9,name:'Buy multiple packs',view:null},
   {level:12,name:'Card hunting mode',view:'hunting'},
+  {level:13,name:'Battle arena',view:'battle'},
   {level:15,name:'Rebirth',view:'rebirth'}
 ];
 const INITIAL = {coins:600,level:1,xp:0,collection:{},stored:[],rebirths:0,huntTarget:null,welcomeClaimed:false,packCount:0,deliveries:[],activeReview:null};
 let state = loadState();
 let activeFilter = 'all';
+let battleChoice = null;
+let battleResult = null;
 let toastTimer;
 
 function loadState(){
@@ -105,14 +108,16 @@ function levelUp(){
 function addXp(amount){state.xp+=amount;return levelUp();}
 function persistRender(){save();render();}
 function setView(view){
+  if(view==='packs'){openPhone();return;}
   const unlocked=UNLOCKS.find(u=>u.view===view);
   if(unlocked&&state.level<unlocked.level){toast(`Unlocks at level ${unlocked.level}. Keep collecting!`);return;}
-  const names={packs:'Pack shop',collection:'Collection',journal:'Collection journal',storage:'Pack storage',hunting:'Card hunting',rebirth:'Rebirth'};
+  const names={packs:'Ordermart',collection:'Collection',journal:'Collection journal',storage:'Pack storage',hunting:'Card hunting',battle:'Battle arena',rebirth:'Rebirth'};
   document.getElementById('crumbTitle').textContent=names[view]||'Pack shop';
   document.querySelectorAll('.view').forEach(el=>el.classList.toggle('active',el.id===`view-${view}`));
   document.querySelectorAll('.nav-link[data-view]').forEach(el=>el.classList.toggle('active',el.dataset.view===view));
   document.getElementById('sidebar').classList.remove('open');
   if(view==='hunting')renderHunting();
+  if(view==='battle')renderBattle();
   document.querySelector('.app-shell').scrollIntoView({behavior:'smooth',block:'start'});
 }
 function render(){
@@ -141,7 +146,7 @@ function render(){
   document.getElementById('rebirthRequirement').textContent=`Level ${Math.min(state.level,15)} / 15`;
   document.getElementById('rebirthProgress').style.width=Math.min(100,state.level/15*100)+'%';
   const rebirthButton=document.getElementById('rebirthButton');rebirthButton.disabled=state.level<15;rebirthButton.innerHTML=state.level>=15?'Rebirth now <span>↗</span>':'Rebirth unavailable <span>↗</span>';
-  renderPacks();renderCollection();renderJournal();renderStorage();renderHunting();
+  renderPacks();renderCollection();renderJournal();renderStorage();renderHunting();renderBattle();
 }
 function renderPacks(){
   const grid=document.getElementById('packGrid');
@@ -158,10 +163,37 @@ function renderCollection(){
   if(!cards.length){grid.innerHTML=`<div class="empty-state"><div><span>✧</span><strong>${ownedCount()?'No cards in this tier yet':'Your collection is waiting.'}</strong><p>${ownedCount()?'Open a few more packs to discover a card in this tier.':'Buy your first pack to meet your new favorite.'}</p><button class="button button-dark" data-goto="packs">Explore packs <span>↗</span></button></div></div>`;return;}
   grid.innerHTML=cards.map(c=>cardMarkup(c,state.collection[c.id])).join('');
 }
-function cardMarkup(c,copies=1){return `<article class="creature-card"><div class="creature-art ${tierClass(c.tier)} cr-art-bg"><small>${c.tier.toUpperCase()} · No. ${String(CARD_POOL.indexOf(c)+1).padStart(3,'0')}</small>${copies>1?`<span class="copies">×${copies}</span>`:''}<span class="creature-emoji">${c.emoji}</span></div><div class="creature-info"><h3>${c.name}</h3><div class="creature-meta"><span class="tier ${tierClass(c.tier)}">${c.tier}</span><span class="power">✦ ${c.power} PWR</span></div></div></article>`;}
+function artSeed(card){return [...card.id].reduce((sum,char,index)=>sum+char.charCodeAt(0)*(index+3),0);}
+function creatureArt(card,label=''){const seed=artSeed(card),hue=seed%360,accent=(hue+78+seed%80)%360;return `<div class="creature-art ${tierClass(card.tier)} cgi-card-art" style="--art-hue:${hue};--art-accent:${accent};--art-seed:${seed%12}"><small>${label||`${card.tier.toUpperCase()} · No. ${String(CARD_POOL.indexOf(card)+1).padStart(3,'0')}`}</small><span class="cgi-orbit"></span><span class="cgi-orbit cgi-orbit-two"></span><span class="cgi-particle particle-one">✦</span><span class="cgi-particle particle-two">✧</span><span class="creature-emoji cgi-sprite">${card.emoji}</span></div>`;}
+function cardMarkup(c,copies=1){return `<article class="creature-card">${creatureArt(c)}${copies>1?`<span class="copies">×${copies}</span>`:''}<div class="creature-info"><h3>${c.name}</h3><div class="creature-meta"><span class="tier ${tierClass(c.tier)}">${c.tier}</span><span class="power">✦ ${c.power} PWR</span></div></div></article>`;}
+function battleArt(card,side){return `<div class="battle-card-face">${creatureArt(card,side)}<strong>${card.name}</strong><span>✦ ${card.power} PWR</span></div>`;}
+function renderBattle(){
+  const team=document.getElementById('battleTeam');if(!team)return;
+  const cards=CARD_POOL.filter(card=>state.collection[card.id]);
+  team.innerHTML=cards.length?cards.map(card=>`<button class="battle-pick ${battleChoice===card.id?'selected':''}" data-battle-card="${card.id}" aria-pressed="${battleChoice===card.id}">${creatureArt(card,card.tier.toUpperCase())}<strong>${card.name}</strong><small>✦ ${card.power} PWR${state.collection[card.id]>1?` · ×${state.collection[card.id]}`:''}</small></button>`).join(''):'<div class="battle-empty">Discover a card in a pack before entering your first duel.</div>';
+  const chosen=CARD_POOL.find(card=>card.id===battleChoice&&state.collection[card.id]);
+  const player=document.getElementById('battlePlayerSlot'),opponent=document.getElementById('battleOpponentSlot');
+  if(player)player.innerHTML=chosen?battleArt(chosen,'YOUR CHAMPION'):'<span class="battle-placeholder">Choose a card below</span>';
+  if(opponent)opponent.innerHTML=battleResult?battleArt(battleResult.opponent,'CHALLENGER'):'<span class="battle-placeholder">Ready when you are</span>';
+  const message=document.getElementById('battleMessage');
+  if(message)message.textContent=battleResult?battleResult.message:chosen?`${chosen.name} is ready. Feeling lucky?`:'Pick one of your discovered cards to start a friendly battle.';
+  const start=document.getElementById('battleStart');if(start){start.disabled=!chosen;start.textContent=battleResult?'Battle again':chosen?'Start friendly battle':'Choose your champion';}
+}
+function runBattle(){
+  const player=CARD_POOL.find(card=>card.id===battleChoice&&state.collection[card.id]);if(!player)return;
+  const contenders=CARD_POOL.filter(card=>card.id!==player.id&&card.power<=player.power+18);
+  const pool=contenders.length?contenders:CARD_POOL.filter(card=>card.id!==player.id);
+  const opponent=pool[Math.floor(Math.random()*pool.length)];
+  const playerScore=player.power*(.85+Math.random()*.3),opponentScore=opponent.power*(.85+Math.random()*.3);
+  const won=playerScore>=opponentScore;
+  state.coins+=won?35:10;
+  const levels=addXp(won?30:18);notifyLevelUps(levels);
+  battleResult={opponent,message:won?`${player.name} wins! Lovely teamwork. +35 coins and ${won?30:18} XP.`:`${opponent.name} takes this one. Your champion still earned 10 coins and 18 XP!`};
+  save();render();
+}
 function renderJournal(){
   const grid=document.getElementById('journalGrid');
-  const cards=CARD_POOL.map(c=>state.collection[c.id]?cardMarkup(c,state.collection[c.id]):`<article class="creature-card journal-unknown"><div class="creature-art tier-normal cr-art-bg"><small>UNDISCOVERED</small><span class="creature-emoji">${c.emoji}</span></div><div class="creature-info"><h3>???</h3><div class="creature-meta"><span class="tier tier-normal">Unknown</span><span class="power">✦ ???</span></div></div></article>`);
+  const cards=CARD_POOL.map(c=>state.collection[c.id]?cardMarkup(c,state.collection[c.id]):`<article class="creature-card journal-unknown">${creatureArt(c,'UNDISCOVERED')}<div class="creature-info"><h3>???</h3><div class="creature-meta"><span class="tier tier-normal">Unknown</span><span class="power">✦ ???</span></div></div></article>`);
   grid.innerHTML=cards.join('');
 }
 function renderStorage(){
@@ -173,7 +205,7 @@ function renderHunting(){
   const el=document.getElementById('huntOptions');if(!el)return;
   const discovered=CARD_POOL.filter(c=>state.collection[c.id]);
   if(!discovered.length){el.innerHTML='<div class="empty-state"><div><span>⌕</span><strong>Meet a few creatures first.</strong><p>Discover cards in packs, then pick one to focus your search.</p></div></div>';}
-  else el.innerHTML=discovered.map(c=>`<button class="hunt-option ${state.huntTarget===c.id?'selected':''}" data-hunt="${c.id}"><span class="hunt-creature ${tierClass(c.tier)} cr-art-bg">${c.emoji}</span><span><strong>${c.name}</strong><small>${c.tier}</small></span></button>`).join('');
+  else el.innerHTML=discovered.map(c=>`<button class="hunt-option ${state.huntTarget===c.id?'selected':''}" data-hunt="${c.id}"><span class="hunt-creature-wrap">${creatureArt(c,c.tier.toUpperCase())}</span><span><strong>${c.name}</strong><small>${c.tier}</small></span></button>`).join('');
   document.getElementById('huntStatus').textContent=state.huntTarget?`Searching for ${CARD_POOL.find(c=>c.id===state.huntTarget)?.name}. Slightly increased chance in your next pack.`:'Select a creature to begin your search.';
 }
 function notifyLevelUps(levels){if(levels.length){const latest=levels[levels.length-1];toast(`Level up! You're now level ${latest}.`);setTimeout(()=>{const just=UNLOCKS.find(u=>u.level===latest);if(just)toast(`Unlocked: ${just.name}!`);},1600);}}
@@ -209,7 +241,7 @@ function showReviewCard(){
   document.getElementById('unboxTitle').textContent=`Card ${review.index+1} of ${review.cards.length}`;
   document.getElementById('unboxSubtitle').textContent=state.collection[c.id]?`You already have ${state.collection[c.id]} ${c.name}${state.collection[c.id]===1?'':'s'}. What should happen to this one?`:`A new discovery! Choose its home.`;
   document.getElementById('unboxProgress').style.width=`${((review.index+1)/review.cards.length)*100}%`;
-  stage.innerHTML=`<article class="revealed-card ${tierClass(c.tier)}"><div class="revealed-card-top"><span>${c.tier.toUpperCase()} · POCKET POST</span><span>NO. ${String(CARD_POOL.indexOf(c)+1).padStart(3,'0')}</span></div><div class="revealed-card-art">${c.emoji}<span>✦ ${c.power} PWR</span></div><h3>${c.name}</h3><p>${c.tier} · ${state.collection[c.id]?'Duplicate':'New discovery'}</p></article>`;
+  stage.innerHTML=`<article class="revealed-card ${tierClass(c.tier)}"><div class="revealed-card-top"><span>${c.tier.toUpperCase()} · POCKET POST</span><span>NO. ${String(CARD_POOL.indexOf(c)+1).padStart(3,'0')}</span></div><div class="revealed-card-art">${creatureArt(c,c.tier.toUpperCase())}<span>✦ ${c.power} PWR</span></div><h3>${c.name}</h3><p>${c.tier} · ${state.collection[c.id]?'Duplicate':'New discovery'}</p></article>`;
   document.getElementById('unboxActions').innerHTML=`<button class="review-keep" data-review="keep" data-card="${c.id}"><span>▤</span><b>Collection</b><small>Keep this card</small></button><button class="review-sell" data-review="sell" data-card="${c.id}"><span>◉</span><b>Sell +${sellValue(c.id)}</b><small>Earn coins</small></button><button class="review-trash" data-review="trash" data-card="${c.id}"><span>⌫</span><b>Trash</b><small>Let it go</small></button>`;
   document.getElementById('unboxDone').hidden=true;
 }
@@ -242,6 +274,9 @@ function finishUnbox(){document.getElementById('unboxOverlay').classList.remove(
 function rebirth(){if(state.level<15)return;const ok=confirm('Rebirth now? Your level, coins, and unopened deliveries reset. Your collection and any cards already being reviewed stay safe, and your luck bonus grows.');if(!ok)return;state.rebirths++;state.level=1;state.xp=0;state.coins=600;state.stored=[];state.deliveries=[];state.huntTarget=null;persistRender();setView('rebirth');toast(`Rebirth ${state.rebirths}! Your card luck is now ${Math.round(state.rebirths*25)}% stronger.`);}
 
 document.addEventListener('click',event=>{
+  const phoneTrigger=event.target.closest('[data-open-phone]');if(phoneTrigger){openPhone();return;}
+  const battleCard=event.target.closest('[data-battle-card]');if(battleCard){battleChoice=battleCard.dataset.battleCard;battleResult=null;renderBattle();return;}
+  if(event.target.closest('#battleStart')){runBattle();return;}
   const nav=event.target.closest('[data-view]');if(nav){setView(nav.dataset.view);return;}
   const goto=event.target.closest('[data-goto]');if(goto){setView(goto.dataset.goto);return;}
   if(event.target.closest('[data-buy],[data-store]')){openPhone();return;}
@@ -250,9 +285,9 @@ document.addEventListener('click',event=>{
     const review=event.target.closest('[data-review]');if(review){resolveReview(review);return;}
   const hunt=event.target.closest('[data-hunt]');if(hunt){state.huntTarget=hunt.dataset.hunt;persistRender();toast('Hunt target set! Your next pack has a better chance.');return;}
     if(event.target.id==='heroBuy'){openPhone();return;}
-  if(event.target.id==='phoneButton'){openPhone();return;}
+  if(event.target.closest('#phoneButton')){openPhone();return;}
   if(event.target.id==='phoneBack'||event.target===document.getElementById('phoneOverlay')){closePhone();return;}
-  if(event.target.id==='deliveryButton'){startUnbox();return;}
+  if(event.target.closest('#deliveryButton')){startUnbox();return;}
   if(event.target.id==='unboxDone'){finishUnbox();return;}
   if(event.target.id==='unboxClose'||event.target===document.getElementById('unboxOverlay')){finishUnbox();return;}
   if(event.target.id==='storagePhoneButton'){openPhone();return;}
