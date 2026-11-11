@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#10131c" />
+  <title>CHECKMATE — King vs. Omni Rook</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="page-shell">
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="Checkmate home"><span class="brand-mark">♔</span><span>ENDGAME<span class="brand-dot">.</span></span></a>
+      <div class="top-note"><span class="live-dot"></span> ARCADE CHESS // VOL. 01</div>
+      <button class="sound-toggle" id="soundToggle" aria-label="Toggle sound" title="Toggle sound"><span id="soundIcon">♫</span><span class="sound-label">SOUND ON</span></button>
+    </header>
+
+    <main>
+      <section class="intro">
+        <div class="eyebrow"><span>01</span> &nbsp; THE ROYAL RUMBLE</div>
+        <h1>CHECK<span class="title-slash">/</span>MATE</h1>
+        <p>One king. One shotgun. An entire board of bad decisions.</p>
+      </section>
+
+      <section class="game-shell" aria-label="King versus Omni Rook game">
+        <div class="game-topline">
+          <div class="boss-title"><span class="boss-icon">♜</span><div><span class="label">BOSS FIGHT</span><strong>THE OMNI ROOK</strong></div></div>
+          <div class="boss-health-wrap"><div class="health-meta"><span>THREAT LEVEL <b id="phaseLabel">I · WAKING</b></span><span><b id="bossHpText">100</b><i> / 100</i></span></div><div class="health-track"><div id="bossHealth" class="health-fill"></div><div class="health-glint"></div></div></div>
+          <button class="icon-button" id="pauseButton" aria-label="Pause game" title="Pause (P)">Ⅱ</button>
+        </div>
+        <div class="canvas-wrap">
+          <canvas id="game" aria-label="Game arena. Move with WASD or arrow keys, aim with mouse or touch, fire with click or space." tabindex="0"></canvas>
+          <div class="board-coords" aria-hidden="true"><span>a</span><span>b</span><span>c</span><span>d</span><span>e</span><span>f</span><span>g</span><span>h</span></div>
+          <div class="overlay" id="overlay">
+            <div class="overlay-card"><div class="overlay-emblem" id="overlayEmblem">♔</div><div class="eyebrow" id="overlayEyebrow">A VERY UNFAIR GAME OF CHESS</div><h2 id="overlayTitle">THE KING<br><em>HAS HAD IT.</em></h2><p id="overlayText">The Omni Rook moves in every direction.<br>You have a shotgun. Make it count.</p><button id="startButton" class="primary-button">TAKE YOUR TURN <span>→</span></button><div class="overlay-hint">NO EN PASSANT. NO MERCY.</div></div>
+          </div>
+          <div class="toast" id="toast" aria-live="polite"></div>
+        </div>
+        <div class="game-footer">
+          <div class="player-readout"><span class="king-chip">♔</span><div><span class="label">WHITE KING</span><strong id="playerState">STANDING</strong></div></div>
+          <div class="ammo-block"><span class="label">SHELLS</span><div id="ammoPips" class="ammo-pips"><i></i><i></i><i></i><i></i><i></i><i></i></div><span class="reload-note" id="reloadNote">PUMP ACTION</span></div>
+          <div class="survival"><span class="label">LIVES</span><div id="lives" class="lives">♥ ♥ ♥</div></div>
+          <div class="score-block"><span class="label">SCORE</span><strong id="score">00000</strong></div>
+        </div>
+      </section>
+
+      <section class="below-game">
+        <div class="controls-card"><div class="card-label">YOUR MOVES</div><div class="control-row"><div class="key-group"><kbd>W</kbd><div><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></div></div><span>OR</span><div class="arrow-keys"><kbd>↑</kbd><div><kbd>←</kbd><kbd>↓</kbd><kbd>→</kbd></div></div><p>MOVE THE KING</p></div><div class="control-row compact"><kbd class="wide-key">SPACE</kbd><span>FIRE SHOTGUN</span><span class="separator">/</span><span>CLICK</span></div></div>
+        <div class="tip-card"><span class="tip-icon">✳</span><div><div class="card-label">FIELD NOTES</div><p>Keep moving. The rook's lines are deadly, but its glowing tells give away the next strike. Get close for a tighter spread.</p></div></div>
+        <div class="smallprint"><span>♟</span> A ROYAL PAIN IN THE CHECKERED BOARD <span>♟</span></div>
+      </section>
+    </main>
+    <footer><span>ENDGAME ARCADE</span><span>EST. 10:37 PM &nbsp; · &nbsp; NO DRAW OFFERS</span></footer>
+  </div>
+  <script src="game.js"></script>
+</body>
+</html>
