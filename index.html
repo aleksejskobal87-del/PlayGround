@@ -35,9 +35,13 @@
           <canvas id="game" aria-label="Game arena. Move with WASD or arrow keys, aim with mouse or touch, fire with click or space." tabindex="0"></canvas>
           <div class="board-coords" aria-hidden="true"><span>a</span><span>b</span><span>c</span><span>d</span><span>e</span><span>f</span><span>g</span><span>h</span></div>
           <div class="overlay" id="overlay">
-            <div class="overlay-card"><div class="overlay-emblem" id="overlayEmblem">♔</div><div class="eyebrow" id="overlayEyebrow">A VERY UNFAIR GAME OF CHESS</div><h2 id="overlayTitle">THE KING<br><em>HAS HAD IT.</em></h2><p id="overlayText">The Omni Rook moves in every direction.<br>You have a shotgun. Make it count.</p><button id="startButton" class="primary-button">TAKE YOUR TURN <span>→</span></button><div class="overlay-hint">NO EN PASSANT. NO MERCY.</div></div>
+            <div class="overlay-card"><div class="overlay-emblem" id="overlayEmblem">♔</div><div class="eyebrow" id="overlayEyebrow">A VERY UNFAIR GAME OF CHESS</div><h2 id="overlayTitle">THE KING<br><em>HAS HAD IT.</em></h2><p id="overlayText">The Omni Rook moves in every direction.<br>You have a shotgun. Make it count.</p><button id="startButton" class="primary-button">TAKE YOUR TURN <span>→</span></button><div class="overlay-hint" id="overlayHint">NO EN PASSANT. NO MERCY.</div></div>
           </div>
           <div class="toast" id="toast" aria-live="polite"></div>
+          <div class="touch-controls" aria-label="Touch controls">
+            <div class="stick-zone" id="stickZone" aria-label="Virtual joystick"><div class="stick-base"><div class="stick-knob" id="stickKnob"></div></div><span>MOVE</span></div>
+            <div class="touch-actions"><button class="touch-button parry-button" id="parryButton" aria-label="Parry attack">PARRY <small>READY</small></button><button class="touch-button shoot-button" id="shootButton" aria-label="Fire shotgun">FIRE <small>SHOTGUN</small></button></div>
+          </div>
         </div>
         <div class="game-footer">
           <div class="player-readout"><span class="king-chip">♔</span><div><span class="label">WHITE KING</span><strong id="playerState">STANDING</strong></div></div>
@@ -48,8 +52,8 @@
       </section>
 
       <section class="below-game">
-        <div class="controls-card"><div class="card-label">YOUR MOVES</div><div class="control-row"><div class="key-group"><kbd>W</kbd><div><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></div></div><span>OR</span><div class="arrow-keys"><kbd>↑</kbd><div><kbd>←</kbd><kbd>↓</kbd><kbd>→</kbd></div></div><p>MOVE THE KING</p></div><div class="control-row compact"><kbd class="wide-key">SPACE</kbd><span>FIRE SHOTGUN</span><span class="separator">/</span><span>CLICK</span></div></div>
-        <div class="tip-card"><span class="tip-icon">✳</span><div><div class="card-label">FIELD NOTES</div><p>Keep moving. The rook's lines are deadly, but its glowing tells give away the next strike. Get close for a tighter spread.</p></div></div>
+        <div class="controls-card"><div class="card-label">YOUR MOVES</div><div class="control-row"><div class="key-group"><kbd>W</kbd><div><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></div></div><span>OR</span><div class="arrow-keys"><kbd>↑</kbd><div><kbd>←</kbd><kbd>↓</kbd><kbd>→</kbd></div></div><p>MOVE THE KING</p></div><div class="control-row compact"><kbd class="wide-key">SPACE</kbd><span>FIRE SHOTGUN</span><span class="separator">/</span><span>CLICK</span><span class="separator">·</span><kbd class="wide-key">SHIFT</kbd><span>PARRY</span></div></div>
+        <div class="tip-card"><span class="tip-icon">✳</span><div><div class="card-label">FIELD NOTES</div><p>Watch the colored tells. Parry just before a hit to reflect shots, stun the rook, and earn bonus damage.</p></div></div>
         <div class="smallprint"><span>♟</span> A ROYAL PAIN IN THE CHECKERED BOARD <span>♟</span></div>
       </section>
     </main>
